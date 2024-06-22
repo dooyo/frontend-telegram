@@ -13,11 +13,9 @@ module.exports = {
       env: {
         node: true
       },
-      files: [
-        '.eslintrc.{js,cjs}'
-      ],
+      files: ['.eslintrc.{js,cjs}'],
       parserOptions: {
-        'sourceType': 'script'
+        sourceType: 'script'
       }
     }
   ],
@@ -26,11 +24,8 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module'
   },
-  plugins: [
-    '@typescript-eslint',
-    'react'
-  ],
+  plugins: ['@typescript-eslint', 'react'],
   rules: {
-    'react/react-in-jsx-scope': 0,
+    'react/react-in-jsx-scope': 0
   }
 };
