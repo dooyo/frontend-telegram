@@ -1,0 +1,12 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 50px; /* Height of the navbar */
+}
+
+.content {
+  flex: 1;
+  padding-bottom: 50px; /* Ensure content does not overlap with navbar */
+}

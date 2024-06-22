@@ -1,16 +1,16 @@
-import { SDKProvider, useLaunchParams } from '@tma.js/sdk-react';
-import { type FC, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
+import { SDKProvider, useLaunchParams } from '@tma.js/sdk-react';
 import { AppRoot } from '@telegram-apps/telegram-ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
-import { AuthProvider } from '../context/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { routes } from '@/navigation/routes.tsx';
+import { AppLayout } from '@/components/AppLayout/AppLayout';
 
 const queryClient = new QueryClient();
 
-const ErrorBoundaryError: FC<{ error: unknown }> = ({ error }) => (
+const ErrorBoundaryError: React.FC<{ error: unknown }> = ({ error }) => (
   <div>
     <p>An unhandled error occurred:</p>
     <blockquote>
@@ -25,7 +25,7 @@ const ErrorBoundaryError: FC<{ error: unknown }> = ({ error }) => (
   </div>
 );
 
-const Inner: FC = () => {
+const Inner: React.FC = () => {
   const debug = useLaunchParams().startParam === 'debug';
 
   // Enable debug mode to see all the methods sent and events received.
@@ -41,8 +41,20 @@ const Inner: FC = () => {
         <SDKProvider acceptCustomStyles debug={debug}>
           <AuthProvider>
             <Routes>
-              {routes.map((route) => (
-                <Route key={route.path} {...route} />
+              {routes.map(({ path, Component, layout }) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={
+                    layout ? (
+                      <AppLayout>
+                        <Component />
+                      </AppLayout>
+                    ) : (
+                      <Component />
+                    )
+                  }
+                />
               ))}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
@@ -53,7 +65,7 @@ const Inner: FC = () => {
   );
 };
 
-export const Root: FC = () => (
+export const Root: React.FC = () => (
   <ErrorBoundary fallback={ErrorBoundaryError}>
     <BrowserRouter>
       <Inner />

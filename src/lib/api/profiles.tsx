@@ -1,37 +1,38 @@
-import axios from 'axios';
 import { API_URL } from './config';
 import { UserType } from '@/lib/types';
 import { getAuthToken } from './auth';
 
-const getMe = async () => {
+const getMe = async (): Promise<UserType> => {
   const authToken = await getAuthToken();
   if (!authToken) {
     return {} as UserType;
   }
 
   try {
-    const response = await axios.get(`${API_URL}/profiles/me`, {
+    const response = await fetch(`${API_URL}/profiles/me`, {
       headers: {
-        Cookie: authToken,
+        Authorization: authToken,
         'Content-Type': 'application/json'
       }
     });
-    if (response.status !== 200) {
+    if (!response.ok) {
       throw new Error('Failed to fetch posts');
     }
-    return response.data as UserType;
+    const data = await response.json();
+    return data as UserType;
   } catch (error) {
     throw new Error(`Failed fetching posts: ${error}`);
   }
 };
 
-const getProfileById = async (userId: string) => {
+const getProfileById = async (userId: string): Promise<UserType> => {
   try {
-    const response = await axios.get(`${API_URL}/profiles?_id=${userId}`);
-    if (response.status !== 200) {
+    const response = await fetch(`${API_URL}/profiles?_id=${userId}`);
+    if (!response.ok) {
       throw new Error('Failed to fetch profile');
     }
-    return response.data as UserType;
+    const data = await response.json();
+    return data as UserType;
   } catch (error) {
     throw new Error(`Failed fetching profile: ${error}`);
   }
@@ -43,13 +44,14 @@ const getProfilesSearch = async (
   skip?: number
 ): Promise<UserType[]> => {
   try {
-    const response = await axios.get(
+    const response = await fetch(
       `${API_URL}/profiles/search?username=${username}`
     );
-    if (response.status !== 200) {
+    if (!response.ok) {
       throw new Error('Failed to search profiles');
     }
-    return response.data;
+    const data = await response.json();
+    return data;
   } catch (error) {
     throw new Error(`Failed fetching profile: ${error}`);
   }
