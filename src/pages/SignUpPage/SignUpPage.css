@@ -1,0 +1,106 @@
+.container {
+  background-color: white;
+  flex: 1;
+  justify-content: center;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.label {
+  font-size: 24px;
+  margin: 5px 0;
+  color: gray;
+}
+
+.input {
+  border-color: gray;
+  border-width: 1px;
+  padding: 10px;
+  font-size: 20px;
+  margin: 5px 0;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.passwordContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-color: gray;
+  border-width: 1px;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.passwordInput {
+  flex: 1;
+  font-size: 20px;
+  border: none;
+  outline: none;
+}
+
+.eyeIcon {
+  padding: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.button {
+  background-color: #050a12;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin: 5px 0;
+  width: 100%;
+  max-width: 400px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disabledButton {
+  background-color: lightgray;
+  cursor: not-allowed;
+}
+
+.errorContainer {
+  border-color: red;
+}
+
+.errorInput {
+  border-color: red;
+}
+
+.avatar {
+  width: 200px;
+  height: 200px;
+}
+
+.redirectButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  font-size: 18px;
+  color: #007bff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.redirectButton:hover {
+  color: #0056b3;
+}

@@ -36,7 +36,9 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (loading) return;
 
-    const isAuthRoute = location.pathname.startsWith('/auth');
+    const isAuthRoute =
+      location.pathname.startsWith('/signIn') ||
+      location.pathname.startsWith('/signUp');
     console.log('location.pathname', location.pathname);
     console.log('isAuthRoute', isAuthRoute);
     console.log('useEffect authToken', authToken);

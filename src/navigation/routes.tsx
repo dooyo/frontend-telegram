@@ -1,6 +1,7 @@
 import type { ComponentType, JSX } from 'react';
 import { FeedPage } from '@/pages/FeedPage/FeedPage';
 import { SignInPage } from '@/pages/SignInPage/SignInPage';
+import { SignUpPage } from '@/pages/SignUpPage/SignUpPage';
 
 interface Route {
   path: string;
@@ -11,5 +12,6 @@ interface Route {
 
 export const routes: Route[] = [
   { path: '/', Component: FeedPage, title: 'Feed' },
-  { path: '/signIn', Component: SignInPage, title: 'Sign In' }
+  { path: '/signIn', Component: SignInPage, title: 'Sign In' },
+  { path: '/signUp', Component: SignUpPage, title: 'Sign Up' }
 ];
