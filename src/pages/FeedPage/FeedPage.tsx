@@ -41,7 +41,7 @@ export const FeedPage: FC = () => {
         ))}
       </ul>
 
-      <Link to="/new-post" className="floating-button">
+      <Link to="/newPost" className="floating-button">
         <MdAdd className="feather-icon" />
       </Link>
     </div>

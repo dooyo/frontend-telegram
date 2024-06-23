@@ -23,7 +23,7 @@ const getPost = async (id: string) => {
   const response = await fetch(`${API_URL}/posts/${id}`, {
     method: 'GET',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     }
   });
@@ -42,7 +42,7 @@ const postCommentOnPost = async (id: string, data: { text: string }) => {
   const response = await fetch(`${API_URL}/posts/${id}/comments`, {
     method: 'POST',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
@@ -65,7 +65,7 @@ const createPost = async (data: { text: string }) => {
   const response = await fetch(`${API_URL}/posts`, {
     method: 'POST',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
@@ -87,7 +87,7 @@ const likePost = async (postId: string) => {
   const response = await fetch(`${API_URL}/likes/post/${postId}`, {
     method: 'POST',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     }
   });
@@ -107,7 +107,7 @@ const dislikePost = async (postId: string) => {
   const response = await fetch(`${API_URL}/dislikes/post/${postId}`, {
     method: 'POST',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     }
   });
@@ -128,7 +128,7 @@ const likeComment = async (commentId: string) => {
   const response = await fetch(`${API_URL}/likes/comment/${commentId}`, {
     method: 'POST',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     }
   });
@@ -148,7 +148,7 @@ const dislikeComment = async (commentId: string) => {
   const response = await fetch(`${API_URL}/dislikes/comment/${commentId}`, {
     method: 'POST',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     }
   });

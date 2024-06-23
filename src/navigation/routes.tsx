@@ -3,6 +3,7 @@ import { FeedPage } from '@/pages/FeedPage/FeedPage';
 import { SignInPage } from '@/pages/SignInPage/SignInPage';
 import { SignUpPage } from '@/pages/SignUpPage/SignUpPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
+import { NewPostPage } from '@/pages/NewPostPage/NewPostPage';
 
 interface Route {
   path: string;
@@ -16,5 +17,6 @@ export const routes: Route[] = [
   { path: '/', Component: FeedPage, title: 'Feed', layout: true },
   { path: '/signIn', Component: SignInPage, title: 'Sign In' },
   { path: '/signUp', Component: SignUpPage, title: 'Sign Up' },
-  { path: '/profile', Component: ProfilePage, title: 'Profile', layout: true }
+  { path: '/profile', Component: ProfilePage, title: 'Profile', layout: true },
+  { path: '/newPost', Component: NewPostPage, title: 'New Post' }
 ];
