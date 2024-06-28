@@ -11,21 +11,23 @@ const Post: FC<{ post: PostType }> = ({ post }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { mutateAsync: likePostMutation, isPending: isLikePending } = useMutation({
-    mutationFn: likePost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['post', post._id] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-    },
-  });
+  const { mutateAsync: likePostMutation, isPending: isLikePending } =
+    useMutation({
+      mutationFn: likePost,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['post', post._id] });
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
+      }
+    });
 
-  const { mutateAsync: dislikePostMutation, isPending: isDislikePending } = useMutation({
-    mutationFn: dislikePost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['post', post._id] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-    },
-  });
+  const { mutateAsync: dislikePostMutation, isPending: isDislikePending } =
+    useMutation({
+      mutationFn: dislikePost,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['post', post._id] });
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
+      }
+    });
 
   const handleLikePost = async () => {
     try {
@@ -50,7 +52,9 @@ const Post: FC<{ post: PostType }> = ({ post }) => {
       <div
         className="post__header"
         onClick={() => {
-          me._id === post.user._id ? navigate('/modal') : navigate(`/profile/${post.user._id}`);
+          me._id === post.user._id
+            ? navigate('/modal')
+            : navigate(`/profile/${post.user._id}`);
         }}
       >
         <img
@@ -66,10 +70,17 @@ const Post: FC<{ post: PostType }> = ({ post }) => {
           <span className="post__username">{post.user.username}</span>
           <span className="post__user-handle">@{post.user.username}</span>
         </div>
-        <i className="post__options" onClick={() => console.log('clicked on dots')}>•••</i>
+        <i
+          className="post__options"
+          onClick={() => console.log('clicked on dots')}
+        >
+          •••
+        </i>
       </div>
       <p className="post__content">{post.text}</p>
-      {post.image && <img src={post.image} alt="post content" className="post__image" />}
+      {post.image && (
+        <img src={post.image} alt="post content" className="post__image" />
+      )}
       <div className="post__footer">
         <IconButton
           icon="comment-outline"
