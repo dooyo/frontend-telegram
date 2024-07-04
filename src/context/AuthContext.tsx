@@ -36,24 +36,17 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (loading) return;
 
-    const isAuthRoute =
-      location.pathname.startsWith('/signIn') ||
-      location.pathname.startsWith('/signUp');
-    console.log('location.pathname', location.pathname);
-    console.log('isAuthRoute', isAuthRoute);
-    console.log('useEffect authToken', authToken);
-    if (!authToken && !isAuthRoute) {
-      console.log('No token... redirecting', authToken);
+    if (location.pathname.startsWith('/signUp')) return;
+    if (!authToken) {
+      console.log('No token... redirecting to /signIn', authToken);
       navigate('/signIn');
-    } else if (authToken && isAuthRoute) {
+    } else {
       const decodedToken = jwtDecode<{ exp: number }>(authToken);
+      console.log('decodedToken', decodedToken);
       if (decodedToken.exp && Date.now() >= decodedToken.exp * 1000) {
         console.log('Token expired... resetting', authToken);
         removeAuthToken();
         navigate('/signIn');
-      } else {
-        console.log('Token valid... redirecting', authToken);
-        navigate('/');
       }
     }
   }, [location.pathname, authToken, navigate, loading]);
