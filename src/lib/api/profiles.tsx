@@ -39,9 +39,9 @@ const getProfileById = async (userId: string): Promise<UserType> => {
 };
 
 const getProfilesSearch = async (
-  username: string,
-  limit?: number,
-  skip?: number
+  username: string
+  // limit?: number,
+  // skip?: number
 ): Promise<UserType[]> => {
   try {
     const response = await fetch(
