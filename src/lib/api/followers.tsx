@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { API_URL } from './config';
 import { Following } from '../types';
 import { getAuthToken } from './auth';
@@ -9,20 +8,17 @@ const isMeFollowingUser = async (userId: string): Promise<boolean> => {
     return false;
   }
 
-  try {
-    const response = await axios.get(`${API_URL}/followers/${userId}/me`, {
-      headers: {
-        Cookie: authToken,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch posts');
+  const response = await fetch(`${API_URL}/followers/${userId}/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
     }
-    return response.data;
-  } catch (error) {
-    throw new Error(`Failed fetching posts: ${error}`);
+  });
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch posts');
   }
+  return response.json();
 };
 
 const isUserFollowingMe = async (userId: string): Promise<boolean> => {
@@ -31,20 +27,17 @@ const isUserFollowingMe = async (userId: string): Promise<boolean> => {
     return false;
   }
 
-  try {
-    const response = await axios.get(`${API_URL}/following/${userId}/me`, {
-      headers: {
-        Cookie: authToken,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch posts');
+  const response = await fetch(`${API_URL}/following/${userId}/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
     }
-    return response.data;
-  } catch (error) {
-    throw new Error(`Failed fetching posts: ${error}`);
+  });
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch posts');
   }
+  return response.json();
 };
 
 const getMyFollowers = async (): Promise<Following[]> => {
@@ -53,20 +46,17 @@ const getMyFollowers = async (): Promise<Following[]> => {
     return [] as Following[];
   }
 
-  try {
-    const response = await axios.get(`${API_URL}/followers`, {
-      headers: {
-        Cookie: authToken,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch posts');
+  const response = await fetch(`${API_URL}/followers`, {
+    method: 'GET',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
     }
-    return response.data as Following[];
-  } catch (error) {
-    throw new Error(`Failed fetching posts: ${error}`);
+  });
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch posts');
   }
+  return response.json();
 };
 
 const getFollowers = async (
@@ -79,23 +69,20 @@ const getFollowers = async (
     return [];
   }
 
-  try {
-    const response = await axios.get(
-      `${API_URL}/followers/${userId}?page=${page}&limit=${limit}`,
-      {
-        headers: {
-          Cookie: authToken,
-          'Content-Type': 'application/json'
-        }
+  const response = await fetch(
+    `${API_URL}/followers/${userId}?page=${page}&limit=${limit}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: authToken,
+        'Content-Type': 'application/json'
       }
-    );
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch posts');
     }
-    return response.data;
-  } catch (error) {
-    throw new Error(`Failed fetching posts: ${error}`);
+  );
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch posts');
   }
+  return response.json();
 };
 
 const getMyFollowings = async (): Promise<Following[]> => {
@@ -104,20 +91,17 @@ const getMyFollowings = async (): Promise<Following[]> => {
     return [];
   }
 
-  try {
-    const response = await axios.get(`${API_URL}/following`, {
-      headers: {
-        Cookie: authToken,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch posts');
+  const response = await fetch(`${API_URL}/following`, {
+    method: 'GET',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
     }
-    return response.data;
-  } catch (error) {
-    throw new Error(`Failed fetching posts: ${error}`);
+  });
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch posts');
   }
+  return response.json();
 };
 
 const getFollowings = async (
@@ -130,23 +114,20 @@ const getFollowings = async (
     return [];
   }
 
-  try {
-    const response = await axios.get(
-      `${API_URL}/following/${userId}?page=${page}&limit=${limit}`,
-      {
-        headers: {
-          Cookie: authToken,
-          'Content-Type': 'application/json'
-        }
+  const response = await fetch(
+    `${API_URL}/following/${userId}?page=${page}&limit=${limit}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: authToken,
+        'Content-Type': 'application/json'
       }
-    );
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch posts');
     }
-    return response.data;
-  } catch (error) {
-    throw new Error(`Failed fetching posts: ${error}`);
+  );
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch posts');
   }
+  return response.json();
 };
 
 const postFollow = async (userId: string) => {
@@ -157,7 +138,7 @@ const postFollow = async (userId: string) => {
   const response = await fetch(`${API_URL}/follow/${userId}`, {
     method: 'POST',
     headers: {
-      Cookie: authToken,
+      Authorization: authToken,
       'Content-Type': 'application/json'
     }
   });
