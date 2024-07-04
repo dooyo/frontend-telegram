@@ -1,9 +1,9 @@
 {
-  "name": "reactjs-template",
+  "name": "frontend-telegram",
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "homepage": "https://telegram-mini-apps.github.io/reactjs-template",
+  "homepage": "https://dooyo.github.io/frontend-telegram",
   "scripts": {
     "deploy": "gh-pages -d dist",
     "dev": "vite",
