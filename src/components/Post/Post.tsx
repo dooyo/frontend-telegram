@@ -52,9 +52,7 @@ const Post: FC<{ post: PostType }> = ({ post }) => {
       <div
         className="post__header"
         onClick={() => {
-          me._id === post.user._id
-            ? navigate('/modal')
-            : navigate(`/profile/${post.user._id}`);
+          navigate(`/post/${post._id}`);
         }}
       >
         <img
@@ -65,14 +63,37 @@ const Post: FC<{ post: PostType }> = ({ post }) => {
           }
           alt="user avatar"
           className="post__avatar"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/profile/${post.user._id}`);
+          }}
         />
         <div className="post__user-info">
-          <span className="post__username">{post.user.username}</span>
-          <span className="post__user-handle">@{post.user.username}</span>
+          <span
+            className="post__username"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/profile/${post.user._id}`);
+            }}
+          >
+            {post.user.username}
+          </span>
+          <span
+            className="post__user-handle"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/profile/${post.user._id}`);
+            }}
+          >
+            @{post.user.username}
+          </span>
         </div>
         <i
           className="post__options"
-          onClick={() => console.log('clicked on dots')}
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('clicked on dots');
+          }}
         >
           •••
         </i>
