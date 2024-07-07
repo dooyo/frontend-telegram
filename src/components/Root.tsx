@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SDKProvider, useLaunchParams } from '@tma.js/sdk-react';
 import { AppRoot } from '@telegram-apps/telegram-ui';
@@ -27,13 +27,6 @@ const ErrorBoundaryError: React.FC<{ error: unknown }> = ({ error }) => (
 
 const Inner: React.FC = () => {
   const debug = useLaunchParams().startParam === 'debug';
-
-  // Enable debug mode to see all the methods sent and events received.
-  useEffect(() => {
-    if (debug) {
-      import('eruda').then((lib) => lib.default.init());
-    }
-  }, [debug]);
 
   return (
     <AppRoot>
