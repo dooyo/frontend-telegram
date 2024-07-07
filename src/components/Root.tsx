@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SDKProvider, useLaunchParams } from '@tma.js/sdk-react';
-import { AppRoot } from '@telegram-apps/telegram-ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
 import { AuthProvider } from '@/context/AuthContext';
@@ -29,7 +28,6 @@ const Inner: React.FC = () => {
   const debug = useLaunchParams().startParam === 'debug';
 
   return (
-    <AppRoot>
       <QueryClientProvider client={queryClient}>
         <SDKProvider acceptCustomStyles debug={debug}>
           <AuthProvider>
@@ -54,7 +52,6 @@ const Inner: React.FC = () => {
           </AuthProvider>
         </SDKProvider>
       </QueryClientProvider>
-    </AppRoot>
   );
 };
 

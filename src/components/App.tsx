@@ -1,3 +1,4 @@
+import { FC, useEffect, useMemo, ReactNode } from 'react';
 import {
   bindMiniAppCSSVars,
   bindThemeParamsCSSVars,
@@ -8,8 +9,19 @@ import {
   useThemeParams,
   useViewport
 } from '@tma.js/sdk-react';
-import { AppRoot } from '@telegram-apps/telegram-ui';
-import { type FC, useEffect, useMemo } from 'react';
+
+interface AppRootProps {
+  platform: 'ios' | 'base';
+  children?: ReactNode;
+}
+
+const AppRoot: FC<AppRootProps> = ({ platform, children }) => {
+  return (
+    <div className={`app-root ${platform}`}>
+      {children}
+    </div>
+  );
+};
 
 export const App: FC = () => {
   const lp = useLaunchParams();
@@ -40,8 +52,8 @@ export const App: FC = () => {
 
   return (
     <AppRoot
-      appearance={miniApp.isDark ? 'dark' : 'light'}
       platform={['macos', 'ios'].includes(lp.platform) ? 'ios' : 'base'}
-    ></AppRoot>
+    >
+    </AppRoot>
   );
 };

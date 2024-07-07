@@ -15,10 +15,8 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.45.0",
-    "@telegram-apps/telegram-ui": "^2.1.4",
     "@tma.js/react-router-integration": "^4.0.2",
     "@tma.js/sdk-react": "^2.2.3",
-    "@tonconnect/ui-react": "^2.0.5",
     "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
