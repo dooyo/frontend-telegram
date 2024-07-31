@@ -98,7 +98,14 @@ const Post: FC<{ post: PostType }> = ({ post }) => {
           •••
         </i>
       </div>
-      <p className="post__content">{post.text}</p>
+      <p
+        className="post__content"
+        onClick={() => {
+          navigate(`/post/${post._id}`);
+        }}
+      >
+        {post.text}
+      </p>
       {post.image && (
         <img src={post.image} alt="post content" className="post__image" />
       )}

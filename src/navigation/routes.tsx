@@ -26,5 +26,10 @@ export const routes: Route[] = [
     layout: true
   },
   { path: '/newPost', Component: NewPostPage, title: 'New Post' },
-  { path: '/post/:id', Component: PostPage, title: 'What a post!' }
+  {
+    path: '/post/:id',
+    Component: PostPage,
+    title: 'What a post!',
+    layout: true
+  }
 ];

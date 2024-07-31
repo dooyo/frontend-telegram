@@ -3,16 +3,16 @@ import {
   MdComment,
   MdAccessTime,
   MdFavorite,
-  MdFavoriteBorder,
-  MdShare
+  MdShare,
+  MdHeartBroken
 } from 'react-icons/md';
 import './IconButton.css';
 
 const icons: { [key: string]: any } = {
   'comment-outline': MdComment,
   'clock-outline': MdAccessTime,
-  'heart-outline': MdFavoriteBorder,
-  'heart-off-outline': MdFavorite,
+  'heart-outline': MdFavorite,
+  'heart-off-outline': MdHeartBroken,
   'share-outline': MdShare
 };
 
