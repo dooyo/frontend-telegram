@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.45.0",
-    "@tma.js/react-router-integration": "^4.0.2",
+    "@tma.js/react-router-integration": "^6.0.0",
     "@tma.js/sdk-react": "^2.2.3",
     "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
