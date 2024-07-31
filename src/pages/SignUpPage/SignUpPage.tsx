@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../../lib/api/auth';
 import './SignUpPage.css';
+import Input from '@/components/Input/Input';
 
 export const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,8 +10,6 @@ export const SignUpPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [avatar, setAvatar] = useState<File>(null as unknown as any);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleImagePicker = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,62 +47,37 @@ export const SignUpPage: React.FC = () => {
         Sign In
       </button>
       <h1 className="label">Create new account</h1>
-      <input
-        className="input"
-        placeholder="Username"
+      <Input
+        title="Name"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        autoCapitalize="none"
+        placeholder="Name"
       />
-      <input
-        className="input"
-        placeholder="Email"
+      <Input
+        type="email"
+        title="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        autoCapitalize="none"
+        placeholder="Email"
       />
-      <div className="passwordContainer">
-        <input
-          className="passwordInput"
-          placeholder="Password"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoCapitalize="none"
-        />
-        {password !== '' && (
-          <button
-            className="eyeIcon"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? '👁️' : '🔒'}
-          </button>
-        )}
-      </div>
-      <div
-        className={`passwordContainer ${
-          confirmPasswordError ? 'errorContainer' : ''
-        }`}
-      >
-        <input
-          className={`passwordInput ${
-            confirmPasswordError ? 'errorInput' : ''
-          }`}
-          placeholder="Confirm Password"
-          type={showConfirmPassword ? 'text' : 'password'}
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          autoCapitalize="none"
-        />
-        {confirmPassword !== '' && (
-          <button
-            className="eyeIcon"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
-            {showConfirmPassword ? '👁️' : '🔒'}
-          </button>
-        )}
-      </div>
+
+      <Input
+        type="password"
+        title="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+      />
+
+      <Input
+        type="password"
+        title="Confirm password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="Password"
+        hasError={confirmPasswordError}
+      />
+
       <input type="file" onChange={handleImagePicker} />
       {avatar && (
         <img

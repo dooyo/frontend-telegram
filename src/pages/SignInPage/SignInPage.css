@@ -1,5 +1,4 @@
 .container {
-  background-color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -8,45 +7,9 @@
   height: 100vh;
 }
 
-.label {
-  font-size: 24px;
+.title {
+  font-size: 30px;
   margin: 5px 0;
-  color: gray;
-}
-
-.input {
-  border: 1px solid gray;
-  padding: 10px;
-  font-size: 20px;
-  margin: 5px 0;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 400px;
-}
-
-.passwordContainer {
-  display: flex;
-  align-items: center;
-  border: 1px solid gray;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 400px;
-}
-
-.passwordInput {
-  flex: 1;
-  font-size: 20px;
-  border: none;
-  outline: none;
-}
-
-.eyeIcon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 10px;
 }
 
 .button {
@@ -72,21 +35,4 @@
 .disabledButton {
   background-color: lightgray;
   cursor: not-allowed;
-}
-
-.redirectButton {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 10px;
-  font-size: 18px;
-  color: #007bff;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.redirectButton:hover {
-  color: #0056b3;
 }

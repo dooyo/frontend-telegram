@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { login, getMe } from '@/lib/api/auth';
 import { useAuth } from '@/context/AuthContext';
 import './SignInPage.css';
+import Input from '@/components/Input/Input';
+import { Link as RouterLink } from 'react-router-dom';
 
 export const SignInPage: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const { updateAuthToken, updateMe } = useAuth() as any;
   const navigate = useNavigate();
 
@@ -29,36 +30,23 @@ export const SignInPage: FC = () => {
 
   return (
     <div className="container">
-      <button className="redirectButton" onClick={() => navigate('/signUp')}>
-        Sign Up
-      </button>
-      <h1 className="label">Sign into your account</h1>
-      <input
-        className="input"
+      <h1 className="title">Welcome</h1>
+      <Input
         type="email"
-        placeholder="Email"
+        title="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        autoComplete="off"
+        placeholder="Email"
       />
-      <div className="passwordContainer">
-        <input
-          className="passwordInput"
-          type={showPassword ? 'text' : 'password'}
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="off"
-        />
-        {password && (
-          <button
-            className="eyeIcon"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? '👁️' : '🔒'}
-          </button>
-        )}
-      </div>
+
+      <Input
+        type="password"
+        title="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+      />
+
       <button
         className={`button ${!isSignInEnabled() ? 'disabledButton' : ''}`}
         onClick={onSignIn}
@@ -66,6 +54,11 @@ export const SignInPage: FC = () => {
       >
         Sign in
       </button>
+
+      <div>
+        <p>Don&rsquo;t have an account?</p>
+        <RouterLink to="/signUp">Create an account</RouterLink>
+      </div>
     </div>
   );
 };
