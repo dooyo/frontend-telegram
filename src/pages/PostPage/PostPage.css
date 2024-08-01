@@ -2,8 +2,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding: 20px;
   position: relative;
   height: 100vh;
   overflow: hidden;
@@ -37,6 +35,7 @@
   background-color: white;
   padding: 10px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  padding-bottom: 65px;
 }
 
 .comment-input {

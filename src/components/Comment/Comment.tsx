@@ -98,7 +98,7 @@ const Comment: React.FC<PropsType> = ({ comment }) => {
             ...
           </span>
         </div>
-        <div className="content">{comment.text}</div>
+        <div className="comment-content">{comment.text}</div>
         <div className="footer">
           <IconButton
             icon="clock-outline"
