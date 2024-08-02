@@ -52,9 +52,11 @@ export const SignInPage: FC = () => {
         Log in
       </Button>
 
-      <div>
+      <div className="signup-prompt">
+        <div className="line" />
         <p>Don&rsquo;t have an account?</p>
-        <RouterLink to="/signUp">Create an account</RouterLink>
+        <span onClick={() => navigate('/signUp')}>Create an account</span>
+        <div className="line" />
       </div>
     </div>
   );

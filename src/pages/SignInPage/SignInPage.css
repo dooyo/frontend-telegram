@@ -11,3 +11,24 @@
   font-size: 30px;
   margin: 5px 0;
 }
+
+.signup-prompt span {
+  cursor: pointer;
+  padding: 0 5px;
+  color: #26a4ff;
+}
+
+.signup-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.signup-prompt .line {
+  flex-grow: 1;
+  height: 2px;
+  background: #cbc3be;
+  margin: 0 10px;
+}
