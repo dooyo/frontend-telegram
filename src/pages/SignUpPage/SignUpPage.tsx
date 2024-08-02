@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { register } from '../../lib/api/auth';
 import './SignUpPage.css';
 import Input from '@/components/Input/Input';
+import Button from '@/components/Button/Button';
 
 export const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -86,13 +87,9 @@ export const SignUpPage: React.FC = () => {
           className="avatar"
         />
       )}
-      <button
-        className={`button ${!isSignUpEnabled() ? 'disabledButton' : ''}`}
-        onClick={onSignUp}
-        disabled={!isSignUpEnabled()}
-      >
+      <Button disabled={!isSignUpEnabled()} onClick={onSignUp}>
         Sign up
-      </button>
+      </Button>
     </div>
   );
 };

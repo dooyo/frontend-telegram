@@ -1,14 +1,16 @@
-import { type FC } from 'react';
+import { type FC, ReactNode } from 'react';
 import './Button.css';
 
-const Button: FC<{
+type ButtonProps = {
   disabled: boolean;
   onClick: () => void;
-  text: string;
-}> = ({ disabled, onClick, text }) => {
+  children: ReactNode;
+};
+
+const Button: FC<ButtonProps> = ({ disabled, onClick, children }) => {
   return (
-    <button className={`button`} onClick={onClick} disabled={disabled}>
-      {text}
+    <button className="button" onClick={onClick} disabled={disabled}>
+      {children}
     </button>
   );
 };

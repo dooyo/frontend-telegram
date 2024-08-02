@@ -48,7 +48,9 @@ export const SignInPage: FC = () => {
         placeholder="Password"
       />
 
-      <Button disabled={!isSignInEnabled()} onClick={onSignIn} text="Log in" />
+      <Button disabled={!isSignInEnabled()} onClick={onSignIn}>
+        Log in
+      </Button>
 
       <div>
         <p>Don&rsquo;t have an account?</p>
