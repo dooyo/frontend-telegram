@@ -4,7 +4,6 @@ import { login, getMe } from '@/lib/api/auth';
 import { useAuth } from '@/context/AuthContext';
 import './SignInPage.css';
 import Input from '@/components/Input/Input';
-import { Link as RouterLink } from 'react-router-dom';
 import Button from '@/components/Button/Button';
 
 export const SignInPage: FC = () => {
