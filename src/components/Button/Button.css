@@ -1,0 +1,24 @@
+.button {
+  background-color: #202428;
+  height: 50px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin: 5px 0;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #333a45;
+}
+
+.disabledButton {
+  background-color: lightgray;
+  cursor: not-allowed;
+}

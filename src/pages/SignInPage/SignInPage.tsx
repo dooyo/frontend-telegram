@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import './SignInPage.css';
 import Input from '@/components/Input/Input';
 import { Link as RouterLink } from 'react-router-dom';
+import Button from '@/components/Button/Button';
 
 export const SignInPage: FC = () => {
   const [email, setEmail] = useState('');
@@ -47,13 +48,7 @@ export const SignInPage: FC = () => {
         placeholder="Password"
       />
 
-      <button
-        className={`button ${!isSignInEnabled() ? 'disabledButton' : ''}`}
-        onClick={onSignIn}
-        disabled={!isSignInEnabled()}
-      >
-        Sign in
-      </button>
+      <Button disabled={!isSignInEnabled()} onClick={onSignIn} text="Log in" />
 
       <div>
         <p>Don&rsquo;t have an account?</p>
