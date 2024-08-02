@@ -7,11 +7,7 @@ const Button: FC<{
   text: string;
 }> = ({ disabled, onClick, text }) => {
   return (
-    <button
-      className={`button ${disabled ? 'disabledButton' : ''}`}
-      onClick={onClick}
-      disabled={disabled}
-    >
+    <button className={`button`} onClick={onClick} disabled={disabled}>
       {text}
     </button>
   );
