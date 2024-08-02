@@ -1,7 +1,7 @@
 import { ChangeEvent, useState, type FC } from 'react';
 import './Input.css';
 
-const Input: FC<{
+export const Input: FC<{
   title: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -58,5 +58,3 @@ const Input: FC<{
     </div>
   );
 };
-
-export default Input;

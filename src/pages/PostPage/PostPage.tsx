@@ -2,8 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getPost, postCommentOnPost } from '@/lib/api/posts';
-import Post from '@/components/Post/Post';
-import Comment from '@/components/Comment/Comment';
+import { Post } from '@/components/Post/Post';
+import { Comment } from '@/components/Comment/Comment';
 import { PostType } from '@/lib/types';
 import './PostPage.css';
 

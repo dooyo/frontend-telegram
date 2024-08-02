@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { likeComment, dislikeComment } from '@/lib/api/posts';
 import { CommentType, UserType } from '@/lib/types';
 import { timeUntil } from '@/lib/helpers/timeCompute';
-import IconButton from '@/components/IconButton/IconButton';
+import { IconButton } from '@/components/IconButton/IconButton';
 import './Comment.css';
 
 type PropsType = {
   comment: CommentType;
 };
 
-const Comment: React.FC<PropsType> = ({ comment }) => {
+export const Comment: React.FC<PropsType> = ({ comment }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -124,5 +124,3 @@ const Comment: React.FC<PropsType> = ({ comment }) => {
     </div>
   );
 };
-
-export default Comment;

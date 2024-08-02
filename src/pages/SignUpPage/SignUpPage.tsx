@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../../lib/api/auth';
 import './SignUpPage.css';
-import Input from '@/components/Input/Input';
-import Button from '@/components/Button/Button';
+import { Input } from '@/components/Input/Input';
+import { Button } from '@/components/Button/Button';
 
 export const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -52,14 +52,12 @@ export const SignUpPage: React.FC = () => {
         title="Name"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        placeholder="Name"
       />
       <Input
         type="email"
         title="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
       />
 
       <Input
@@ -67,7 +65,6 @@ export const SignUpPage: React.FC = () => {
         title="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
       />
 
       <Input
@@ -75,7 +72,6 @@ export const SignUpPage: React.FC = () => {
         title="Confirm password"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
-        placeholder="Password"
         hasError={confirmPasswordError}
       />
 
@@ -87,6 +83,7 @@ export const SignUpPage: React.FC = () => {
           className="avatar"
         />
       )}
+
       <Button disabled={!isSignUpEnabled()} onClick={onSignUp}>
         Sign up
       </Button>

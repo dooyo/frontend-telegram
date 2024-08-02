@@ -12,13 +12,11 @@
   margin: 5px 0;
 }
 
-.signup-prompt span {
-  cursor: pointer;
+.link-style {
   padding: 0 5px;
-  color: #26a4ff;
 }
 
-.signup-prompt {
+.signin-prompt {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,7 +24,7 @@
   width: 100%;
 }
 
-.signup-prompt .line {
+.signin-prompt .line {
   flex-grow: 1;
   height: 2px;
   background: #cbc3be;

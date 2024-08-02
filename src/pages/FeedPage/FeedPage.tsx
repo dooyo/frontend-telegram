@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getPosts } from '@/lib/api/posts';
-import Post from '@/components/Post/Post';
+import { Post } from '@/components/Post/Post';
 import { Link } from 'react-router-dom';
 import './FeedPage.css';
 import { PostType } from '@/lib/types';
