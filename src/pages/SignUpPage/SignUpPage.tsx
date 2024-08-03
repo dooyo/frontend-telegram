@@ -4,6 +4,9 @@ import { register } from '../../lib/api/auth';
 import './SignUpPage.css';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
+import { Avatar } from '@files-ui/react';
+import { Link } from '@/components/Link/Link';
+import avatarPlaceholder from '@/assets/avatarPlaceholder.svg';
 
 export const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -13,10 +16,8 @@ export const SignUpPage: React.FC = () => {
   const [avatar, setAvatar] = useState<File>(null as unknown as any);
   const navigate = useNavigate();
 
-  const handleImagePicker = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setAvatar(event.target.files[0]);
-    }
+  const handleImagePicker = (selectedFile: File) => {
+    setAvatar(selectedFile);
   };
 
   const onSignUp = async () => {
@@ -44,10 +45,26 @@ export const SignUpPage: React.FC = () => {
 
   return (
     <div className="container">
-      <button className="redirectButton" onClick={() => navigate('/signIn')}>
-        Sign In
-      </button>
-      <h1 className="label">Create new account</h1>
+      <h1>Create new account</h1>
+
+      <Avatar
+        alt="Avatar"
+        style={{
+          width: '160px',
+          height: '160px',
+          backgroundColor: '#DFDAD6',
+          border: '1px',
+          borderStyle: 'solid',
+          borderColor: '#CBC3BE'
+        }}
+        changeLabel=""
+        accept="image/*"
+        readOnly={avatar !== null}
+        onChange={handleImagePicker}
+        src={avatar ? URL.createObjectURL(avatar) : avatarPlaceholder}
+        variant="circle"
+      />
+
       <Input
         title="Name"
         value={username}
@@ -75,18 +92,18 @@ export const SignUpPage: React.FC = () => {
         hasError={confirmPasswordError}
       />
 
-      <input type="file" onChange={handleImagePicker} />
-      {avatar && (
-        <img
-          src={URL.createObjectURL(avatar)}
-          alt="avatar"
-          className="avatar"
-        />
-      )}
-
       <Button disabled={!isSignUpEnabled()} onClick={onSignUp}>
         Sign up
       </Button>
+
+      <div className="signin-prompt">
+        <div className="line" />
+        <p>Already have an account?</p>
+        <Link to="/signIn" className="link-style">
+          Sign in
+        </Link>
+        <div className="line" />
+      </div>
     </div>
   );
 };

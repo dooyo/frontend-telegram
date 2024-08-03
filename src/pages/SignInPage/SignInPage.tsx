@@ -31,7 +31,7 @@ export const SignInPage: FC = () => {
 
   return (
     <div className="container">
-      <h1 className="title">Welcome</h1>
+      <h1>Welcome</h1>
       <Input
         type="email"
         title="Email"

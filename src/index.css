@@ -1,17 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 body {
   padding: 0;
   margin: 0;
-  background-color: #F0EBE7;
+  background-color: #f0ebe7;
 }
 
 p,
 input,
 h1 {
   padding: 0;
-  margin: 0;
+  margin: 5px 0;
 
   color: #202428;
   font-weight: normal;
+  font-family: 'Open Sans', sans-serif;
+}
+
+a {
+  font-family: 'Open Sans', sans-serif;
 }
 
 div,
