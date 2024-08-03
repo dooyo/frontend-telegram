@@ -25,7 +25,7 @@ type IconButtonProps = {
   isPressed?: boolean;
 };
 
-const IconButton = ({
+export const IconButton = ({
   icon,
   number,
   onClick,
@@ -49,5 +49,3 @@ const IconButton = ({
     </button>
   );
 };
-
-export default IconButton;

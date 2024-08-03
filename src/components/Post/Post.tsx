@@ -3,11 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { likePost, dislikePost } from '@/lib/api/posts';
 import { timeUntil } from '@/lib/helpers/timeCompute';
-import IconButton from '../IconButton/IconButton';
+import { IconButton } from '../IconButton/IconButton';
 import './Post.css';
 import { PostType, UserType } from '@/lib/types';
 
-const Post: FC<{ post: PostType }> = ({ post }) => {
+export const Post: FC<{ post: PostType }> = ({ post }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -139,5 +139,3 @@ const Post: FC<{ post: PostType }> = ({ post }) => {
     </div>
   );
 };
-
-export default Post;

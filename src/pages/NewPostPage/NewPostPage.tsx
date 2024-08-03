@@ -56,7 +56,11 @@ export const NewPostPage: React.FC = () => {
       </div>
       <div className="buttonsContainer">
         {isPending && <span className="postingText">Posting...</span>}
-        <button onClick={onPostPress} className="button" disabled={isPending}>
+        <button
+          onClick={onPostPress}
+          className="new-post-button"
+          disabled={isPending}
+        >
           Post
         </button>
       </div>

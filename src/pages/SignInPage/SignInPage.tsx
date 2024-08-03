@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { login, getMe } from '@/lib/api/auth';
 import { useAuth } from '@/context/AuthContext';
 import './SignInPage.css';
+import { Input } from '@/components/Input/Input';
+import { Button } from '@/components/Button/Button';
+import { Link } from '@/components/Link/Link';
 
 export const SignInPage: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const { updateAuthToken, updateMe } = useAuth() as any;
   const navigate = useNavigate();
 
@@ -29,43 +31,33 @@ export const SignInPage: FC = () => {
 
   return (
     <div className="container">
-      <button className="redirectButton" onClick={() => navigate('/signUp')}>
-        Sign Up
-      </button>
-      <h1 className="label">Sign into your account</h1>
-      <input
-        className="input"
+      <h1>Welcome</h1>
+      <Input
         type="email"
-        placeholder="Email"
+        title="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        autoComplete="off"
       />
-      <div className="passwordContainer">
-        <input
-          className="passwordInput"
-          type={showPassword ? 'text' : 'password'}
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="off"
-        />
-        {password && (
-          <button
-            className="eyeIcon"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? '👁️' : '🔒'}
-          </button>
-        )}
+
+      <Input
+        type="password"
+        title="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <Button disabled={!isSignInEnabled()} onClick={onSignIn}>
+        Log in
+      </Button>
+
+      <div className="signin-prompt">
+        <div className="line" />
+        <p>Don&rsquo;t have an account?</p>
+        <Link to="/signUp" className="link-style">
+          Create an account
+        </Link>
+        <div className="line" />
       </div>
-      <button
-        className={`button ${!isSignInEnabled() ? 'disabledButton' : ''}`}
-        onClick={onSignIn}
-        disabled={!isSignInEnabled()}
-      >
-        Sign in
-      </button>
     </div>
   );
 };
