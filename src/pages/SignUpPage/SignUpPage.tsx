@@ -100,7 +100,7 @@ export const SignUpPage: React.FC = () => {
         <div className="line" />
         <p>Already have an account?</p>
         <Link to="/signIn" className="link-style">
-          Sign in
+          Log in
         </Link>
         <div className="line" />
       </div>
