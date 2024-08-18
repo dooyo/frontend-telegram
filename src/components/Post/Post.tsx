@@ -6,6 +6,7 @@ import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '../IconButton/IconButton';
 import './Post.css';
 import { PostType, UserType } from '@/lib/types';
+import { Avatar } from '@files-ui/react';
 
 export const Post: FC<{ post: PostType }> = ({ post }) => {
   const queryClient = useQueryClient();
@@ -55,14 +56,24 @@ export const Post: FC<{ post: PostType }> = ({ post }) => {
           navigate(`/post/${post._id}`);
         }}
       >
-        <img
+        <Avatar
           src={
             post.user.avatarUrl
               ? post.user.avatarUrl.replace('localhost', '10.100.102.18')
               : 'https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png'
           }
           alt="user avatar"
-          className="post__avatar"
+          style={{
+            width: '50px',
+            height: '50px',
+            backgroundColor: '#DFDAD6',
+            border: '1px',
+            borderStyle: 'solid',
+            borderColor: '#CBC3BE',
+            marginRight: '10px'
+          }}
+          variant="circle"
+          readOnly
           onClick={(e) => {
             e.stopPropagation();
             navigate(`/profile/${post.user._id}`);

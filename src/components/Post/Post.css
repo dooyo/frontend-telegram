@@ -1,72 +1,64 @@
 .post {
-    padding: 15px;
-    border-bottom: 1px solid #e1e8ed;
-    display: flex;
-    flex-direction: column;
-    transition: background-color 0.2s ease;
-  }
-  
-  .post:hover {
-    background-color: #f5f8fa;
-  }
-  
-  .post__header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    cursor: pointer;
-  }
-  
-  .post__avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-  
-  .post__user-info {
-    display: flex;
-    flex-direction: column;
-    margin-left: 10px;
-  }
-  
-  .post__username {
-    font-weight: bold;
-    font-size: 14px;
-    color: #14171a;
-  }
-  
-  .post__user-handle {
-    font-size: 14px;
-    color: #657786;
-    margin-top: 2px;
-  }
-  
-  .post__options {
-    margin-left: auto;
-    font-size: 20px;
-    color: #657786;
-  }
-  
-  .post__content {
-    font-size: 15px;
-    line-height: 20px;
-    color: #14171a;
-    margin-top: 5px;
-    margin-bottom: 10px;
-  }
-  
-  .post__image {
-    width: 100%;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
-  
-  .post__footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #e1e8ed;
-  }
-  
+  padding: 15px;
+  border-bottom: 1px solid #e1e8ed;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.2s ease;
+}
+
+.post:hover {
+  background-color: #f5f8fa;
+}
+
+.post__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.post__user-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.post__username {
+  font-weight: bold;
+  font-size: 14px;
+  color: #14171a;
+}
+
+.post__user-handle {
+  font-size: 14px;
+  color: #657786;
+  margin-top: 2px;
+}
+
+.post__options {
+  margin-left: auto;
+  font-size: 20px;
+  color: #657786;
+}
+
+.post__content {
+  font-size: 15px;
+  line-height: 20px;
+  color: #14171a;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.post__image {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.post__footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e1e8ed;
+}
