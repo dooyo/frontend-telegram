@@ -2,7 +2,7 @@ import { ChangeEvent, useState, type FC } from 'react';
 import './Input.css';
 
 export const Input: FC<{
-  title: string;
+  title?: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
