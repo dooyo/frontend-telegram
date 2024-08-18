@@ -6,6 +6,8 @@ import { Post } from '@/components/Post/Post';
 import { Comment } from '@/components/Comment/Comment';
 import { PostType } from '@/lib/types';
 import './PostPage.css';
+import { Button } from '../../components/Button/Button';
+import { Input } from '../../components/Input/Input';
 
 export const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -75,19 +77,14 @@ export const PostPage: React.FC = () => {
       </div>
       {isPending && <div className="commenting-text">Commenting...</div>}
       <div className="comment-input-container">
-        <textarea
+        <Input
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           placeholder="Write a comment..."
-          className="comment-input"
         />
-        <button
-          onClick={handlePostComment}
-          className="comment-button"
-          disabled={isPending}
-        >
+        <Button onClick={handlePostComment} disabled={isPending}>
           Comment
-        </button>
+        </Button>
       </div>
     </div>
   );
