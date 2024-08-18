@@ -25,7 +25,7 @@ export const routes: Route[] = [
     title: 'Profile',
     layout: true
   },
-  { path: '/newPost', Component: NewPostPage, title: 'New Post' },
+  { path: '/newPost', Component: NewPostPage, title: 'New Post', layout: true },
   {
     path: '/post/:id',
     Component: PostPage,
