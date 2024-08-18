@@ -2,7 +2,7 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  background-color: #007bff;
+  background-color: #202428;
   display: flex;
   justify-content: space-around;
   padding: 10px 0;
@@ -16,7 +16,7 @@
 }
 
 .nav-link:hover {
-  background-color: #0056b3;
+  background-color: #333a45;
   border-radius: 5px;
 }
 
