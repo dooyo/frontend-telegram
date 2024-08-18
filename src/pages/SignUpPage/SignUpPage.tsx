@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from '../../lib/api/auth';
+import { register } from '@/lib/api/auth';
 import './SignUpPage.css';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';

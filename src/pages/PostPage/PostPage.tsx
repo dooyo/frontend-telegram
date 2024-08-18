@@ -6,8 +6,8 @@ import { Post } from '@/components/Post/Post';
 import { Comment } from '@/components/Comment/Comment';
 import { PostType } from '@/lib/types';
 import './PostPage.css';
-import { Button } from '../../components/Button/Button';
-import { Input } from '../../components/Input/Input';
+import { Button } from '@/components/Button/Button';
+import { Input } from '@/components/Input/Input';
 
 export const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
