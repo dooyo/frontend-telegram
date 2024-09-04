@@ -52,10 +52,14 @@ export const SignInPage: FC = () => {
 
       <div className="signin-prompt">
         <div className="line" />
-        <p>Don&rsquo;t have an account?</p>
-        <Link to="/signUp" className="link-style">
-          Create an account
-        </Link>
+        <div>
+          <p className="link-style">Don&rsquo;t have an account?</p>
+        </div>
+        <div>
+          <Link to="/signUp" className="link-style">
+            Create an account
+          </Link>
+        </div>
         <div className="line" />
       </div>
     </div>

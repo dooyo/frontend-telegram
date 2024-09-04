@@ -98,10 +98,14 @@ export const SignUpPage: React.FC = () => {
 
       <div className="signin-prompt">
         <div className="line" />
-        <p>Already have an account?</p>
-        <Link to="/signIn" className="link-style">
-          Log in
-        </Link>
+        <div>
+          <p className="link-style">Already have an account?</p>
+        </div>
+        <div>
+          <Link to="/signIn" className="link-style">
+            Log in
+          </Link>
+        </div>
         <div className="line" />
       </div>
     </div>
