@@ -40,7 +40,7 @@
   max-width: 600px;
 }
 
-.button {
+.new-post-button {
   background-color: lightblue;
   padding: 10px 20px;
   border: none;
@@ -51,11 +51,11 @@
   transition: background-color 0.2s;
 }
 
-.button:hover {
+.new-post-button:hover {
   background-color: #1da1f2;
 }
 
-.button:disabled {
+.new-post-button:disabled {
   background-color: #a0d3ff;
   cursor: not-allowed;
 }

@@ -1,5 +1,4 @@
 .container {
-  background-color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -8,85 +7,22 @@
   height: 100vh;
 }
 
-.label {
-  font-size: 24px;
-  margin: 5px 0;
-  color: gray;
+.link-style {
+  font-size: 14px;
 }
 
-.input {
-  border: 1px solid gray;
-  padding: 10px;
-  font-size: 20px;
-  margin: 5px 0;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 400px;
-}
-
-.passwordContainer {
-  display: flex;
-  align-items: center;
-  border: 1px solid gray;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 400px;
-}
-
-.passwordInput {
-  flex: 1;
-  font-size: 20px;
-  border: none;
-  outline: none;
-}
-
-.eyeIcon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 10px;
-}
-
-.button {
-  background-color: #050a12;
-  height: 50px;
-  width: 100%;
-  max-width: 400px;
+.signin-prompt {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  margin: 5px 0;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  margin-top: 20px;
+  width: 100%;
+  gap: 5px;
 }
 
-.button:hover {
-  background-color: #333a45;
-}
-
-.disabledButton {
-  background-color: lightgray;
-  cursor: not-allowed;
-}
-
-.redirectButton {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 10px;
-  font-size: 18px;
-  color: #007bff;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.redirectButton:hover {
-  color: #0056b3;
+.signin-prompt .line {
+  flex-grow: 1;
+  height: 2px;
+  background: #cbc3be;
+  margin: 0 10px;
 }

@@ -1,0 +1,54 @@
+.input {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  font-size: 16px;
+  flex-grow: 1;
+}
+
+.input-container {
+  padding: 0 16px 0 16px;
+  height: 44px;
+  border-radius: 10px;
+  width: 100%;
+  background-color: #dfdad6;
+  border: 1px solid #cbc3be;
+  display: flex;
+  align-items: center;
+  row-gap: 8px;
+}
+
+.input-container:has(.input:hover:not(:disabled)) {
+  border-color: #7a6d64;
+}
+
+.input-container:has(.input:focus) {
+  border-color: #7a6d64;
+  outline: 1px solid #7a6d64;
+}
+
+.input-container:has(.input:disabled) {
+  outline: none;
+  border-color: #b4ada7;
+  background-color: #efedeb;
+}
+
+.input-title {
+  font-size: 12px;
+  margin: 0 0 4px 16px;
+}
+
+.input-title--disabled {
+  color: #202428;
+  opacity: 0.5;
+}
+
+.input-wrapper {
+  width: 100%;
+}
+
+.input-show-password {
+  background: none;
+  border: none;
+  cursor: pointer;
+}

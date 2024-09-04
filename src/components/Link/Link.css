@@ -1,4 +1,5 @@
 .link {
   text-decoration: none;
-  color: var(--tg-theme-link-color);
+  cursor: pointer;
+  color: #26a4ff;
 }

@@ -5,6 +5,7 @@ import { UserType } from '@/lib/types';
 import { getMe } from '@/lib/api/profiles';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import './ProfilePage.css';
+import { Button } from '@/components/Button/Button';
 
 export const ProfilePage: React.FC = () => {
   const { removeAuthToken } = useAuth() as any;
@@ -48,9 +49,9 @@ export const ProfilePage: React.FC = () => {
           <strong>Expires In:</strong>{' '}
           {data?.expiresAt ? timeUntil(data?.expiresAt) : 'NEVER'}
         </p>
-        <button className="logout-button" onClick={handleLogout}>
+        <Button disabled={false} onClick={handleLogout}>
           Logout
-        </button>
+        </Button>
       </div>
     </div>
   );

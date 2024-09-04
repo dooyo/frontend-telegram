@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { SDKProvider, useLaunchParams } from '@tma.js/sdk-react';
+import { SDKProvider, useLaunchParams } from '@telegram-apps/sdk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
 import { AuthProvider } from '@/context/AuthContext';
@@ -28,36 +28,36 @@ const Inner: React.FC = () => {
   const debug = useLaunchParams().startParam === 'debug';
 
   return (
-      <QueryClientProvider client={queryClient}>
-        <SDKProvider acceptCustomStyles debug={debug}>
-          <AuthProvider>
-            <Routes>
-              {routes.map(({ path, Component, layout }) => (
-                <Route
-                  key={path}
-                  path={path}
-                  element={
-                    layout ? (
-                      <AppLayout>
-                        <Component />
-                      </AppLayout>
-                    ) : (
+    <QueryClientProvider client={queryClient}>
+      <SDKProvider acceptCustomStyles debug={debug}>
+        <AuthProvider>
+          <Routes>
+            {routes.map(({ path, Component, layout }) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  layout ? (
+                    <AppLayout>
                       <Component />
-                    )
-                  }
-                />
-              ))}
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </AuthProvider>
-        </SDKProvider>
-      </QueryClientProvider>
+                    </AppLayout>
+                  ) : (
+                    <Component />
+                  )
+                }
+              />
+            ))}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </AuthProvider>
+      </SDKProvider>
+    </QueryClientProvider>
   );
 };
 
 export const Root: React.FC = () => (
   <ErrorBoundary fallback={ErrorBoundaryError}>
-    <BrowserRouter>
+    <BrowserRouter basename="frontend-telegram">
       <Inner />
     </BrowserRouter>
   </ErrorBoundary>

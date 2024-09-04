@@ -32,30 +32,9 @@
   bottom: 0;
   display: flex;
   flex-direction: column;
-  background-color: white;
   padding: 10px;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   padding-bottom: 65px;
-}
-
-.comment-input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  resize: none;
-}
-
-.comment-button {
-  background-color: lightblue;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 50px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 .comment-button:hover {

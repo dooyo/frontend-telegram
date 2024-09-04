@@ -5,6 +5,7 @@ import { createPost } from '@/lib/api/posts';
 import { getMe } from '@/lib/api/profiles';
 import { UserType } from '@/lib/types';
 import './NewPostPage.css';
+import { Button } from '@/components/Button/Button';
 
 export const NewPostPage: React.FC = () => {
   const [text, setText] = useState('');
@@ -54,12 +55,14 @@ export const NewPostPage: React.FC = () => {
           className="textInput"
         />
       </div>
+
       <div className="buttonsContainer">
-        {isPending && <span className="postingText">Posting...</span>}
-        <button onClick={onPostPress} className="button" disabled={isPending}>
+        <Button onClick={onPostPress} disabled={isPending}>
           Post
-        </button>
+        </Button>
       </div>
+
+      {isPending && <span className="postingText">Posting...</span>}
       {error && <div className="errorText">Error: {error.message}</div>}
     </div>
   );

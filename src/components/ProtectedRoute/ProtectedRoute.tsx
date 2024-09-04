@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { authToken } = useAuth();
   const location = useLocation();
 
@@ -13,5 +13,3 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
   return children;
 };
-
-export default ProtectedRoute;

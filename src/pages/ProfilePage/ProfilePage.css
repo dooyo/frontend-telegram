@@ -4,7 +4,6 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f9f9f9;
   padding: 20px;
 }
 
@@ -14,16 +13,15 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 20px;
-  border: 3px solid #007bff;
+  border: 3px solid #202428;
 }
 
 .placeholder-avatar {
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background-color: #ddd;
   margin-bottom: 20px;
-  border: 3px solid #007bff;
+  border: 3px solid #202428;
 }
 
 .profile-info {
@@ -33,21 +31,6 @@
 .profile-text {
   font-size: 18px;
   margin: 10px 0;
-}
-
-.logout-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.logout-button:hover {
-  background-color: #0056b3;
 }
 
 .loader {
