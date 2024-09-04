@@ -5,6 +5,7 @@ import { SignUpPage } from '@/pages/SignUpPage/SignUpPage';
 import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { NewPostPage } from '@/pages/NewPostPage/NewPostPage';
 import { PostPage } from '@/pages/PostPage/PostPage';
+import { FriendsPage } from '@/pages/FriendsPage/FriendsPage';
 
 interface Route {
   path: string;
@@ -30,6 +31,11 @@ export const routes: Route[] = [
     path: '/post/:id',
     Component: PostPage,
     title: 'What a post!',
+    layout: true
+  },
+  {
+    path: '/friends',
+    Component: FriendsPage,
     layout: true
   }
 ];
