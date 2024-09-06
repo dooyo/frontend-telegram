@@ -1,0 +1,27 @@
+.search-bar-container {
+  position: sticky; /* Makes the element stick to a position when scrolling */
+  top: 0; /* The distance from the top where the element should stick */
+  background-color: #f0ebe7; /* Ensure the background covers content behind it */
+  z-index: 1000; /* Ensures the search bar stays on top of other elements */
+  padding: 10px; /* Adds padding around the search bar */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Adds a slight shadow for visual separation */
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.username {
+  flex: 1;
+  margin-left: 10px;
+  color: black;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}

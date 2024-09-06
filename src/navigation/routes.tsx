@@ -6,6 +6,7 @@ import { ProfilePage } from '@/pages/ProfilePage/ProfilePage';
 import { NewPostPage } from '@/pages/NewPostPage/NewPostPage';
 import { PostPage } from '@/pages/PostPage/PostPage';
 import { FriendsPage } from '@/pages/FriendsPage/FriendsPage';
+import { FriendsSearchPage } from '@/pages/FriendsSearchPage/FriendsSearchPage';
 
 interface Route {
   path: string;
@@ -19,7 +20,6 @@ export const routes: Route[] = [
   { path: '/', Component: FeedPage, title: 'Feed', layout: true },
   { path: '/signIn', Component: SignInPage, title: 'Sign In' },
   { path: '/signUp', Component: SignUpPage, title: 'Sign Up' },
-  { path: '/profile', Component: ProfilePage, title: 'Profile', layout: true },
   {
     path: '/profile/:id',
     Component: ProfilePage,
@@ -36,6 +36,11 @@ export const routes: Route[] = [
   {
     path: '/friends',
     Component: FriendsPage,
+    layout: true
+  },
+  {
+    path: '/friendsSearch',
+    Component: FriendsSearchPage,
     layout: true
   }
 ];

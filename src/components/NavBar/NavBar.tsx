@@ -3,6 +3,8 @@ import { NavLink } from 'react-router-dom';
 import './NavBar.css';
 
 export const NavBar: React.FC = () => {
+  const me = JSON.parse(localStorage.getItem('me') || '{}');
+
   return (
     <div className="navbar">
       <NavLink
@@ -21,14 +23,16 @@ export const NavBar: React.FC = () => {
       >
         Friends
       </NavLink>
-      <NavLink
-        to="/profile"
-        className={({ isActive }) =>
-          isActive ? 'nav-link active' : 'nav-link'
-        }
-      >
-        Profile
-      </NavLink>
+      {me._id && (
+        <NavLink
+          to={`/profile/${me._id}`}
+          className={({ isActive }) =>
+            isActive ? 'nav-link active' : 'nav-link'
+          }
+        >
+          Profile
+        </NavLink>
+      )}
     </div>
   );
 };

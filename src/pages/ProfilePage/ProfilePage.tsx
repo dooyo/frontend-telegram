@@ -1,25 +1,75 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { UserType } from '@/lib/types';
-import { getMe } from '@/lib/api/profiles';
+import { getMe, getProfileById } from '@/lib/api/profiles';
+import {
+  postFollow,
+  isMeFollowingUser,
+  isUserFollowingMe
+} from '@/lib/api/followers';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import './ProfilePage.css';
 import { Button } from '@/components/Button/Button';
+import { Avatar } from '@files-ui/react';
+import { useParams } from 'react-router-dom';
 
 export const ProfilePage: React.FC = () => {
   const { removeAuthToken } = useAuth() as any;
+  const { id: userId } = useParams<{ id: string }>();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isUserFollowing, setIsUserFollowing] = useState(false);
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
 
-  const { data, isLoading, error } = useQuery<UserType>({
+  const { data: me, isLoading: isLoadingMe } = useQuery<UserType>({
     queryKey: ['me'],
     queryFn: getMe
   });
 
-  if (isLoading) {
+  // Fetch profile of the viewed user
+  const {
+    data: userData,
+    isLoading: isLoadingUser,
+    error: userError,
+    refetch
+  } = useQuery<UserType>({
+    queryKey: ['user', userId],
+    queryFn: () => getProfileById(userId as string),
+    enabled: !!userId && userId !== me?._id
+  });
+
+  // Mutation for follow/unfollow
+  const { mutateAsync: followMutation, isPending: isFollowPending } =
+    useMutation({
+      mutationFn: postFollow,
+      onSuccess: () => {
+        setIsFollowing((prev) => !prev);
+        refetch();
+      }
+    });
+
+  useEffect(() => {
+    if (me && userId) {
+      setIsCurrentUser(me._id === userId);
+    }
+
+    const fetchFollowersStatus = async () => {
+      if (userId && userId !== me?._id) {
+        const iFollow = await isMeFollowingUser(userId);
+        const userFollowsMe = await isUserFollowingMe(userId);
+        setIsFollowing(iFollow);
+        setIsUserFollowing(userFollowsMe);
+      }
+    };
+
+    fetchFollowersStatus();
+  }, [me, userId]);
+
+  if (isLoadingMe || isLoadingUser) {
     return <div className="loader">Loading...</div>;
   }
 
-  if (error) {
+  if (userError) {
     return <div className="error">Error loading profile information.</div>;
   }
 
@@ -27,31 +77,60 @@ export const ProfilePage: React.FC = () => {
     removeAuthToken();
   };
 
+  const handleFollow = async () => {
+    try {
+      await followMutation(userData?._id as any);
+    } catch (error) {
+      console.error('Error following/unfollowing user:', error);
+    }
+  };
+
   return (
     <div className="profile-container">
-      {data?.avatarUrl ? (
-        <img
-          src={data.avatarUrl.replace('localhost', '10.100.102.18')}
-          alt="Profile Avatar"
-          className="profile-avatar"
+      {userData?.avatarUrl ? (
+        <Avatar
+          src={userData.avatarUrl.replace('localhost', '10.100.102.18')}
+          alt="user avatar"
+          style={{
+            width: '250px',
+            height: '250px',
+            backgroundColor: '#DFDAD6',
+            border: '1px',
+            borderStyle: 'solid',
+            borderColor: '#CBC3BE',
+            marginRight: '10px'
+          }}
+          variant="circle"
+          readOnly
         />
       ) : (
         <div className="placeholder-avatar"></div>
       )}
       <div className="profile-info">
         <p className="profile-text">
-          <strong>Username:</strong> {data?.username}
+          <strong>Username:</strong> {userData?.username}
         </p>
         <p className="profile-text">
-          <strong>Email:</strong> {data?.email}
+          <strong>Email:</strong> {userData?.email}
         </p>
         <p className="profile-text">
           <strong>Expires In:</strong>{' '}
-          {data?.expiresAt ? timeUntil(data?.expiresAt) : 'NEVER'}
+          {userData?.expiresAt ? timeUntil(userData?.expiresAt) : 'NEVER'}
         </p>
-        <Button disabled={false} onClick={handleLogout}>
-          Logout
-        </Button>
+        {isCurrentUser ? (
+          <Button disabled={false} onClick={handleLogout}>
+            Logout
+          </Button>
+        ) : (
+          <>
+            <Button disabled={isFollowPending} onClick={handleFollow}>
+              {isFollowing ? 'Unfollow' : 'Follow'}
+            </Button>
+            {isUserFollowing && (
+              <p className="profile-text">This user is following you 🤗</p>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

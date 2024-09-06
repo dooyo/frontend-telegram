@@ -44,9 +44,8 @@ export const FriendsPage: React.FC = () => {
   const handleUnfollow = async (userId: string) => {
     try {
       await postFollow(userId);
-      setFollowings((prevFollowings) =>
-        prevFollowings.filter((following) => following.user._id !== userId)
-      );
+      const followingsData = await getMyFollowings();
+      setFollowings(followingsData as Following[]);
     } catch (error) {
       console.error('Failed to unfollow user:', error);
     }
@@ -54,11 +53,12 @@ export const FriendsPage: React.FC = () => {
 
   const renderUser = (item: Following) => (
     <div
+      key={tabIndex === 0 ? item.followerUser._id : item.user._id}
       className="user-item"
       onClick={() =>
-        navigate(
-          `/profile/${tabIndex === 0 ? item.followerUser._id : item.user._id}`
-        )
+        tabIndex === 0
+          ? navigate(`/profile/${item.followerUser._id}`)
+          : navigate(`/profile/${item.user._id}`)
       }
     >
       <Avatar
@@ -87,7 +87,10 @@ export const FriendsPage: React.FC = () => {
         {tabIndex === 1 && (
           <Button
             disabled={false}
-            onClick={() => handleUnfollow(item.user._id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUnfollow(item.user._id);
+            }}
           >
             Unfollow
           </Button>
@@ -108,12 +111,16 @@ export const FriendsPage: React.FC = () => {
 
   return (
     <div>
-      <Input
-        type="text"
-        placeholder={`Search my ${tabIndex === 0 ? 'followers' : 'followings'}`}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        value={searchQuery}
-      />
+      <div className="search-bar-container">
+        <Input
+          type="text"
+          placeholder={`Search my ${
+            tabIndex === 0 ? 'followers' : 'followings'
+          }`}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery}
+        />
+      </div>
       <div className="tab-container">
         <div
           className={`tab ${tabIndex === 0 ? 'active-tab' : ''}`}
@@ -135,7 +142,7 @@ export const FriendsPage: React.FC = () => {
           {filteredData.map((item) => renderUser(item))}
         </div>
       )}
-      <Link to="/newPost" className="floating-button">
+      <Link to="/friendsSearch" className="floating-button">
         <MdAdd className="feather-icon" />
       </Link>
     </div>

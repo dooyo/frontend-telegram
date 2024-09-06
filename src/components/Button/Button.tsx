@@ -1,9 +1,9 @@
-import { type FC, ReactNode } from 'react';
+import { FC, ReactNode, MouseEvent } from 'react';
 import './Button.css';
 
 type ButtonProps = {
   disabled: boolean;
-  onClick: () => void;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   children: ReactNode;
 };
 
