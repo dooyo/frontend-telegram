@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '@/lib/api/auth';
-import './SignUpPage.css';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
 import { Avatar } from '@files-ui/react';
@@ -10,10 +9,8 @@ import avatarPlaceholder from '@/assets/avatarPlaceholder.svg';
 
 export const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [avatar, setAvatar] = useState<File>(null as unknown as any);
+  const [avatar, setAvatar] = useState<File | null>(null);
   const navigate = useNavigate();
 
   const handleImagePicker = (selectedFile: File) => {
@@ -21,31 +18,31 @@ export const SignUpPage: React.FC = () => {
   };
 
   const onSignUp = async () => {
+    if (!avatar) {
+      alert('Please select an avatar image.');
+      return;
+    }
+
     try {
-      await register({ email, password, username, avatar });
-      navigate('/signIn');
+      await register({ email, username, avatar });
+      navigate('/otp', { state: { email } });
     } catch (error: any) {
       alert(error.message);
     }
   };
 
   const isSignUpEnabled = () => {
-    return (
-      email !== '' &&
-      password !== '' &&
-      confirmPassword !== '' &&
-      password === confirmPassword &&
-      username !== '' &&
-      avatar !== null
-    );
+    return email !== '' && username !== '' && avatar !== null;
   };
 
-  const confirmPasswordError =
-    password !== confirmPassword && confirmPassword !== '';
+  const resetEmail = () => setEmail('');
+  const resetUsername = () => setUsername('');
 
   return (
-    <div className="container">
-      <h1>Create new account</h1>
+    <div className="flex flex-col justify-center items-center p-6 min-h-screen">
+      <h1 className="text-[30px] font-normal leading-[40px] text-center text-[#202428] w-[290px] mb-9">
+        Create new account
+      </h1>
 
       <Avatar
         alt="Avatar"
@@ -65,48 +62,38 @@ export const SignUpPage: React.FC = () => {
         variant="circle"
       />
 
-      <Input
-        title="Name"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <Input
-        type="email"
-        title="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <div className="w-full max-w-sm space-y-4">
+        <Input
+          title="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          onReset={resetUsername}
+        />
 
-      <Input
-        type="password"
-        title="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <Input
+          type="email"
+          title="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onReset={resetEmail}
+        />
 
-      <Input
-        type="password"
-        title="Confirm password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        hasError={confirmPasswordError}
-      />
+        <Button disabled={!isSignUpEnabled()} onClick={onSignUp}>
+          Sign up
+        </Button>
 
-      <Button disabled={!isSignUpEnabled()} onClick={onSignUp}>
-        Sign up
-      </Button>
-
-      <div className="signin-prompt">
-        <div className="line" />
-        <div>
-          <p className="link-style">Already have an account?</p>
+        <div className="flex items-center justify-center mt-5 w-full gap-2">
+          <div className="flex-grow h-0.5 bg-[#cbc3be]" />
+          <div>
+            <p className="text-sm">Already have an account?</p>
+          </div>
+          <div>
+            <Link to="/signIn" className="text-sm">
+              Log in
+            </Link>
+          </div>
+          <div className="flex-grow h-0.5 bg-[#cbc3be]" />
         </div>
-        <div>
-          <Link to="/signIn" className="link-style">
-            Log in
-          </Link>
-        </div>
-        <div className="line" />
       </div>
     </div>
   );

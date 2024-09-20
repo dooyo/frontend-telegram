@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     if (loading) return;
 
     if (location.pathname.startsWith('/signUp')) return;
+    if (location.pathname.startsWith('/otp')) return;
     if (!authToken) {
       console.log('No token... redirecting to /signIn', authToken);
       navigate('/signIn');
