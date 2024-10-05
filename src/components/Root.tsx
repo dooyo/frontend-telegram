@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { SDKProvider, useLaunchParams } from '@telegram-apps/sdk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
 import { AuthProvider } from '@/context/AuthContext';
@@ -25,32 +24,28 @@ const ErrorBoundaryError: React.FC<{ error: unknown }> = ({ error }) => (
 );
 
 const Inner: React.FC = () => {
-  const debug = useLaunchParams().startParam === 'debug';
-
   return (
     <QueryClientProvider client={queryClient}>
-      <SDKProvider acceptCustomStyles debug={debug}>
-        <AuthProvider>
-          <Routes>
-            {routes.map(({ path, Component, layout }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  layout ? (
-                    <AppLayout>
-                      <Component />
-                    </AppLayout>
-                  ) : (
+      <AuthProvider>
+        <Routes>
+          {routes.map(({ path, Component, layout }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                layout ? (
+                  <AppLayout>
                     <Component />
-                  )
-                }
-              />
-            ))}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </AuthProvider>
-      </SDKProvider>
+                  </AppLayout>
+                ) : (
+                  <Component />
+                )
+              }
+            />
+          ))}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
