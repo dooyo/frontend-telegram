@@ -1,5 +1,5 @@
 import { API_URL } from './config';
-import { UserType } from '@/lib/types';
+import { UserStatsType, UserType } from '@/lib/types';
 import { getAuthToken } from './auth';
 
 const getMe = async (): Promise<UserType> => {
@@ -38,6 +38,19 @@ const getProfileById = async (userId: string): Promise<UserType> => {
   }
 };
 
+const getProfileStatsById = async (userId: string): Promise<UserStatsType> => {
+  try {
+    const response = await fetch(`${API_URL}/profiles/stats?_id=${userId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch profile stats');
+    }
+    const data = await response.json();
+    return data as UserStatsType;
+  } catch (error) {
+    throw new Error(`Failed fetching profile stats: ${error}`);
+  }
+};
+
 const getProfilesSearch = async (
   username: string
   // limit?: number,
@@ -57,4 +70,4 @@ const getProfilesSearch = async (
   }
 };
 
-export { getMe, getProfileById, getProfilesSearch };
+export { getMe, getProfileById, getProfileStatsById, getProfilesSearch };

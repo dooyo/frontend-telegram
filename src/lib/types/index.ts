@@ -8,6 +8,17 @@ export type UserType = {
   expiresAt: string;
 };
 
+export type UserStatsType = {
+  totalComments: number;
+  totalCommentsLikes: number;
+  totalCommentsDislikes: number;
+  totalCommentsDuration: number;
+  totalPosts: number;
+  totalPostsLikes: number;
+  totalPostsDislikes: number;
+  totalPostsDuration: number;
+};
+
 export type PostType = {
   _id: string;
   user: UserType;

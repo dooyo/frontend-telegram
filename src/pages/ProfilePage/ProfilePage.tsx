@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { UserType } from '@/lib/types';
-import { getMe, getProfileById } from '@/lib/api/profiles';
+import { getMe, getProfileById, getProfileStatsById } from '@/lib/api/profiles';
 import {
   postFollow,
   isMeFollowingUser,
   isUserFollowingMe
 } from '@/lib/api/followers';
-import { timeUntil } from '@/lib/helpers/timeCompute';
+import { timeDurationCalculator, timeUntil } from '@/lib/helpers/timeCompute';
 import './ProfilePage.css';
 import { Button } from '@/components/Button/Button';
 import { Avatar } from '@files-ui/react';
@@ -35,6 +35,13 @@ export const ProfilePage: React.FC = () => {
   } = useQuery<UserType>({
     queryKey: ['user', userId],
     queryFn: () => getProfileById(userId as string),
+    enabled: !!userId && userId !== me?._id
+  });
+
+  // Fetch profile stats of the viewed user
+  const { data: userStats } = useQuery({
+    queryKey: ['userStats', userId],
+    queryFn: () => getProfileStatsById(userId as string),
     enabled: !!userId && userId !== me?._id
   });
 
@@ -116,6 +123,27 @@ export const ProfilePage: React.FC = () => {
         <p className="profile-text">
           <strong>Expires In:</strong>{' '}
           {userData?.expiresAt ? timeUntil(userData?.expiresAt) : 'NEVER'}
+        </p>
+        <p>
+          <strong>Stats:</strong>
+          {userStats && (
+            <ul>
+              <li>Comments: {userStats.totalComments}</li>
+              <li>Comments Likes: {userStats.totalCommentsLikes}</li>
+              <li>Comments Dislikes: {userStats.totalCommentsDislikes}</li>
+              <li>
+                Comments Duration:{' '}
+                {timeDurationCalculator(userStats.totalCommentsDuration)}
+              </li>
+              <li>Posts: {userStats.totalPosts}</li>
+              <li>Posts Likes: {userStats.totalPostsLikes}</li>
+              <li>Posts Dislikes: {userStats.totalPostsDislikes}</li>
+              <li>
+                Posts Duration:{' '}
+                {timeDurationCalculator(userStats.totalPostsDuration)}
+              </li>
+            </ul>
+          )}
         </p>
         {isCurrentUser ? (
           <Button disabled={false} onClick={handleLogout}>
