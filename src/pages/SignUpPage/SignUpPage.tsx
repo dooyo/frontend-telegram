@@ -11,6 +11,7 @@ export const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [avatar, setAvatar] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleImagePicker = (selectedFile: File) => {
@@ -18,16 +19,20 @@ export const SignUpPage: React.FC = () => {
   };
 
   const onSignUp = async () => {
+    if (isLoading) return; // Prevent multiple requests
     if (!avatar) {
       alert('Please select an avatar image.');
       return;
     }
 
+    setIsLoading(true);
     try {
       await register({ email, username, avatar });
       navigate('/otp', { state: { email } });
     } catch (error: any) {
       alert(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,8 +83,8 @@ export const SignUpPage: React.FC = () => {
           onReset={resetEmail}
         />
 
-        <Button disabled={!isSignUpEnabled()} onClick={onSignUp}>
-          Sign up
+        <Button disabled={!isSignUpEnabled() || isLoading} onClick={onSignUp}>
+          {isLoading ? 'Signing Up...' : 'Sign up'}
         </Button>
 
         <div className="flex items-center justify-center mt-5 w-full gap-2">

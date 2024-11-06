@@ -1,20 +1,25 @@
-import { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '@/lib/api/auth';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
 import { Link } from '@/components/Link/Link';
 
-export const SignInPage: FC = () => {
+export const SignInPage: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const onSignIn = async () => {
+    if (isLoading) return; // Prevent multiple requests
+    setIsLoading(true);
     try {
       await login({ email });
       navigate('/otp', { state: { email } });
     } catch (error: any) {
       alert(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -38,8 +43,8 @@ export const SignInPage: FC = () => {
           onReset={resetEmail}
         />
 
-        <Button disabled={!isSignInEnabled()} onClick={onSignIn}>
-          Continue
+        <Button disabled={!isSignInEnabled() || isLoading} onClick={onSignIn}>
+          {isLoading ? 'Signing In...' : 'Continue'}
         </Button>
 
         <div className="flex items-center justify-center mt-5 w-full gap-2">

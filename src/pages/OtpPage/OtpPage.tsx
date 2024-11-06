@@ -20,6 +20,7 @@ export const OtpPage: React.FC = () => {
   const { updateAuthToken, updateMe } = useAuth() as any;
 
   const [otpValue, setOtpValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!email) {
@@ -32,6 +33,8 @@ export const OtpPage: React.FC = () => {
   };
 
   const onVerifyOtp = async () => {
+    if (isLoading) return; // Prevent multiple requests
+    setIsLoading(true);
     try {
       const res = await verifyOtp({ email, otp: otpValue });
       await updateAuthToken(res.authToken);
@@ -40,6 +43,8 @@ export const OtpPage: React.FC = () => {
       navigate('/');
     } catch (error: any) {
       alert(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,8 +83,8 @@ export const OtpPage: React.FC = () => {
         </InputOTP>
       </div>
 
-      <Button disabled={!isVerifyEnabled()} onClick={onVerifyOtp}>
-        Log in
+      <Button disabled={!isVerifyEnabled() || isLoading} onClick={onVerifyOtp}>
+        {isLoading ? 'Logging In...' : 'Log in'}
       </Button>
     </div>
   );
