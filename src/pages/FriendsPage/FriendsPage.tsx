@@ -125,6 +125,7 @@ export const FriendsPage: React.FC = () => {
             }`}
             onChange={(e) => setSearchQuery(e.target.value)}
             value={searchQuery}
+            onReset={() => setSearchQuery('')}
           />
           <div className="flex mb-4">
             <div

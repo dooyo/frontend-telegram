@@ -61,6 +61,7 @@ export const FriendsSearchPage: React.FC = () => {
             placeholder="Search users"
             value={searchTerm}
             onChange={handleSearchChange}
+            onReset={() => setSearchTerm('')}
           />
         </div>
         <div className="divide-y divide-input-border">
