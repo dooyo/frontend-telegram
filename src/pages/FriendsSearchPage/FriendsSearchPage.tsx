@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProfilesSearch } from '@/lib/api/profiles';
 import { UserType } from '@/lib/types';
-import './FriendsSearchPage.css';
 import { Avatar } from '@files-ui/react';
 import { Input } from '@/components/Input/Input';
+import { Container } from '@/components/ui/container';
 
 export const FriendsSearchPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,41 +29,50 @@ export const FriendsSearchPage: React.FC = () => {
   };
 
   const renderUser = (item: UserType) => (
-    <div className="user-item" onClick={() => navigate('/profile/' + item._id)}>
+    <div
+      key={item._id}
+      className="flex items-center p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+      onClick={() => navigate('/profile/' + item._id)}
+    >
       <Avatar
         src={item.avatarUrl?.replace('localhost', '10.100.102.18')}
-        alt="user avatar"
+        alt={`${item.username}'s avatar`}
         style={{
           width: '50px',
           height: '50px',
           backgroundColor: '#DFDAD6',
           border: '1px',
           borderStyle: 'solid',
-          borderColor: '#CBC3BE',
-          marginRight: '10px'
+          borderColor: '#CBC3BE'
         }}
         variant="circle"
         readOnly
       />
-      <span className="username">@{item.username}</span>
+      <span className="flex-1 ml-2.5">@{item.username}</span>
     </div>
   );
 
   return (
-    <div>
-      <div className="search-bar-container">
-        <Input
-          type="text"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
+    <Container>
+      <div className="space-y-4">
+        <div className="sticky top-0 bg-background pt-4 pb-2 z-10 border-b border-input-border">
+          <Input
+            type="text"
+            placeholder="Search users"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
+        <div className="divide-y divide-input-border">
+          {searchResults.length === 0 && searchTerm.length > 2 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No users found
+            </div>
+          ) : (
+            searchResults.map((item) => renderUser(item))
+          )}
+        </div>
       </div>
-      <div className="list">
-        {searchResults.map((item) => (
-          <React.Fragment key={item._id}>{renderUser(item)}</React.Fragment>
-        ))}
-      </div>
-    </div>
+    </Container>
   );
 };
