@@ -58,7 +58,7 @@ export const FriendsPage: React.FC = () => {
     return (
       <div
         key={user?._id || item._id}
-        className="flex items-center p-4 border-b border-input-border cursor-pointer"
+        className="flex items-center p-4 cursor-pointer hover:bg-muted/50 transition-colors"
         onClick={() => {
           if (!isDeletedUser) {
             navigate(`/profile/${user._id}`);
@@ -75,8 +75,7 @@ export const FriendsPage: React.FC = () => {
             backgroundColor: '#DFDAD6',
             border: '1px',
             borderStyle: 'solid',
-            borderColor: '#CBC3BE',
-            marginRight: '10px'
+            borderColor: '#CBC3BE'
           }}
           variant="circle"
           readOnly
@@ -117,7 +116,7 @@ export const FriendsPage: React.FC = () => {
   return (
     <Container>
       <div className="space-y-4">
-        <div className="sticky top-0 bg-background pt-4 pb-2 space-y-4">
+        <div className="sticky top-0 bg-background pt-4 pb-2 space-y-4 z-10 border-b border-input-border">
           <Input
             type="text"
             placeholder={`Search my ${
@@ -127,7 +126,7 @@ export const FriendsPage: React.FC = () => {
             value={searchQuery}
             onReset={() => setSearchQuery('')}
           />
-          <div className="flex mb-4">
+          <div className="flex">
             <div
               className={`flex-1 text-center py-2 cursor-pointer border-b-2 ${
                 tabIndex === 0 ? 'border-primary' : 'border-transparent'
@@ -152,13 +151,15 @@ export const FriendsPage: React.FC = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="mt-4">
+          <div>
             {filteredData.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No {tabIndex === 0 ? 'followers' : 'following'} found
               </div>
             ) : (
-              filteredData.map((item) => renderUser(item))
+              <div className="divide-y divide-input-border">
+                {filteredData.map((item) => renderUser(item))}
+              </div>
             )}
           </div>
         )}
