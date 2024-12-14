@@ -1,39 +1,17 @@
 /* Import your custom font */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import './styles/theme.css';
 
-/* Remove old body styles since we'll handle them with Tailwind */
-
-/* Remove old p, input, h1 styles */
-
-/* Remove old a styles */
-
-/* Remove old div, input styles */
-
-/* Define base styles using Tailwind's @apply */
 @layer base {
-  /* Apply box-sizing globally if needed (Tailwind already does this by default) */
-  /* * {
-    box-sizing: border-box;
-  } */
-
-  /* Apply base styles to body */
+  * {
+    @apply border-border;
+  }
   body {
-    @apply p-0 m-0 bg-background text-foreground font-sans;
-  }
-
-  /* Apply base styles to p, input, h1 */
-  p,
-  input,
-  h1 {
-    @apply p-0 my-1 text-foreground font-normal font-sans;
-  }
-
-  /* Apply base styles to a */
-  a {
-    @apply font-sans;
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 }
