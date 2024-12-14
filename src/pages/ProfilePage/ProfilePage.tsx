@@ -34,13 +34,15 @@ export const ProfilePage: React.FC = () => {
   } = useQuery<UserType>({
     queryKey: ['user', userId],
     queryFn: () => getProfileById(userId as string),
-    enabled: !!userId && userId !== me?._id
+    enabled: !!userId && userId !== me?._id,
+    retry: 2
   });
 
-  const { data: userStats } = useQuery({
+  const { data: userStats, isLoading: isLoadingStats } = useQuery({
     queryKey: ['userStats', userId],
     queryFn: () => getProfileStatsById(userId as string),
-    enabled: !!userId && userId !== me?._id
+    enabled: !!userId && userId !== me?._id,
+    retry: 2
   });
 
   const { mutateAsync: followMutation, isPending: isFollowPending } =
@@ -54,30 +56,44 @@ export const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (me && userId) {
-      setIsCurrentUser(me._id === userId);
+      const isSelf = me._id === userId;
+      setIsCurrentUser(isSelf);
     }
+  }, [me, userId]);
 
+  useEffect(() => {
     const fetchFollowersStatus = async () => {
-      if (userId && userId !== me?._id) {
-        const iFollow = await isMeFollowingUser(userId);
-        const userFollowsMe = await isUserFollowingMe(userId);
-        setIsFollowing(iFollow);
-        setIsUserFollowing(userFollowsMe);
+      if (userId && me && userId !== me._id) {
+        try {
+          const [iFollow, userFollowsMe] = await Promise.all([
+            isMeFollowingUser(userId),
+            isUserFollowingMe(userId)
+          ]);
+          setIsFollowing(iFollow);
+          setIsUserFollowing(userFollowsMe);
+        } catch (error) {
+          console.error('Error fetching follow status:', error);
+        }
       }
     };
 
     fetchFollowersStatus();
   }, [me, userId]);
 
-  if (isLoadingMe || isLoadingUser) {
+  const displayData = isCurrentUser ? me : userData;
+  const isLoading = isLoadingMe || (isLoadingUser && !isCurrentUser);
+
+  if (isLoading) {
     return (
-      <Container className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <Container>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+        </div>
       </Container>
     );
   }
 
-  if (userError) {
+  if (!displayData || userError) {
     return (
       <Container>
         <div className="text-destructive text-center mt-4">
@@ -103,11 +119,14 @@ export const ProfilePage: React.FC = () => {
     <Container className="py-8">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
         <div className="flex-shrink-0">
-          {userData?.avatarUrl ? (
+          {displayData?.avatarUrl ? (
             <div className="relative w-64 h-64 rounded-full overflow-hidden border border-input-border bg-input-background">
               <Avatar
-                src={userData.avatarUrl.replace('localhost', '10.100.102.18')}
-                alt={`${userData.username}'s avatar`}
+                src={displayData.avatarUrl.replace(
+                  'localhost',
+                  '10.100.102.18'
+                )}
+                alt={`${displayData.username}'s avatar`}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -120,7 +139,7 @@ export const ProfilePage: React.FC = () => {
           ) : (
             <div className="w-64 h-64 rounded-full bg-input-background border border-input-border flex items-center justify-center">
               <span className="text-4xl text-muted-foreground">
-                {userData?.username?.charAt(0)?.toUpperCase() || '?'}
+                {displayData?.username?.charAt(0)?.toUpperCase() || '?'}
               </span>
             </div>
           )}
@@ -128,15 +147,17 @@ export const ProfilePage: React.FC = () => {
 
         <div className="flex-grow space-y-6 max-w-2xl">
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold">{userData?.username}</h1>
-            <p className="text-muted-foreground">{userData?.email}</p>
+            <h1 className="text-2xl font-semibold">{displayData?.username}</h1>
+            <p className="text-muted-foreground">{displayData?.email}</p>
             <p className="text-sm">
               Expires in:{' '}
-              {userData?.expiresAt ? timeUntil(userData?.expiresAt) : 'NEVER'}
+              {displayData?.expiresAt
+                ? timeUntil(displayData?.expiresAt)
+                : 'NEVER'}
             </p>
           </div>
 
-          {userStats && (
+          {!isLoadingStats && userStats && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <h2 className="font-medium">Comments</h2>
