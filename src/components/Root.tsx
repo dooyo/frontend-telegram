@@ -52,7 +52,7 @@ const Inner: React.FC = () => {
 
 export const Root: React.FC = () => (
   <ErrorBoundary fallback={ErrorBoundaryError}>
-    <BrowserRouter basename="frontend-telegram">
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Inner />
     </BrowserRouter>
   </ErrorBoundary>

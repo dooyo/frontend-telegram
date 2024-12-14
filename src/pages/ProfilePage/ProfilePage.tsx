@@ -13,7 +13,6 @@ import { Button } from '@/components/Button/Button';
 import { Avatar } from '@files-ui/react';
 import { useParams } from 'react-router-dom';
 import { Container } from '@/components/ui/container';
-import { cn } from '@/lib/utils/cn';
 
 export const ProfilePage: React.FC = () => {
   const { removeAuthToken } = useAuth() as any;
