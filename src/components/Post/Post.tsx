@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { likePost, dislikePost } from '@/lib/api/posts';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '../IconButton/IconButton';
-import './Post.css';
 import { PostType, UserType } from '@/lib/types';
 import { Avatar } from '@files-ui/react';
 
 export const Post: FC<{ post: PostType }> = ({ post }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
 
   const { mutateAsync: likePostMutation, isPending: isLikePending } =
     useMutation({
@@ -46,81 +46,79 @@ export const Post: FC<{ post: PostType }> = ({ post }) => {
     }
   };
 
-  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
+  const handlePostClick = () => navigate(`/post/${post._id}`);
+  const handleUserClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/profile/${post.user._id}`);
+  };
 
   return (
-    <div className="post">
-      <div
-        className="post__header"
-        onClick={() => {
-          navigate(`/post/${post._id}`);
-        }}
-      >
+    <div
+      className="bg-card rounded-lg border border-input-border p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+      onClick={handlePostClick}
+    >
+      <div className="flex items-start gap-3">
         <Avatar
           src={
             post.user.avatarUrl
               ? post.user.avatarUrl.replace('localhost', '10.100.102.18')
               : 'https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png'
           }
-          alt="user avatar"
+          alt={`${post.user.username}'s avatar`}
           style={{
             width: '50px',
             height: '50px',
             backgroundColor: '#DFDAD6',
             border: '1px',
             borderStyle: 'solid',
-            borderColor: '#CBC3BE',
-            marginRight: '10px'
+            borderColor: '#CBC3BE'
           }}
           variant="circle"
           readOnly
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/profile/${post.user._id}`);
-          }}
+          onClick={handleUserClick}
         />
-        <div className="post__user-info">
-          <span
-            className="post__username"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/profile/${post.user._id}`);
-            }}
-          >
-            {post.user.username}
-          </span>
-          <span
-            className="post__user-handle"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/profile/${post.user._id}`);
-            }}
-          >
-            @{post.user.username}
-          </span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col">
+              <button
+                className="text-foreground font-semibold hover:underline text-left"
+                onClick={handleUserClick}
+              >
+                {post.user.username}
+              </button>
+              <button
+                className="text-muted-foreground text-sm hover:underline text-left"
+                onClick={handleUserClick}
+              >
+                @{post.user.username}
+              </button>
+            </div>
+            <button
+              className="text-muted-foreground hover:text-foreground transition-colors px-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('clicked on dots');
+              }}
+            >
+              •••
+            </button>
+          </div>
+          <p className="mt-2 text-foreground break-words whitespace-pre-wrap">
+            {post.text}
+          </p>
+          {post.image && (
+            <img
+              src={post.image}
+              alt="Post content"
+              className="mt-3 rounded-lg max-h-96 w-full object-cover"
+            />
+          )}
         </div>
-        <i
-          className="post__options"
-          onClick={(e) => {
-            e.stopPropagation();
-            console.log('clicked on dots');
-          }}
-        >
-          •••
-        </i>
       </div>
-      <p
-        className="post__content"
-        onClick={() => {
-          navigate(`/post/${post._id}`);
-        }}
+      <div
+        className="flex items-center justify-between mt-4 px-2"
+        onClick={(e) => e.stopPropagation()}
       >
-        {post.text}
-      </p>
-      {post.image && (
-        <img src={post.image} alt="post content" className="post__image" />
-      )}
-      <div className="post__footer">
         <IconButton
           icon="comment-outline"
           number={post.comments.length}
@@ -145,7 +143,7 @@ export const Post: FC<{ post: PostType }> = ({ post }) => {
           onClick={handleDislikePost}
           isPressed={isDislikePending}
         />
-        <IconButton icon="share-outline" />
+        <IconButton icon="share-outline" onClick={() => {}} />
       </div>
     </div>
   );

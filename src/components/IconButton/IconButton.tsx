@@ -6,7 +6,8 @@ import {
   MdShare,
   MdHeartBroken
 } from 'react-icons/md';
-import './IconButton.css';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils/cn';
 
 const icons: { [key: string]: any } = {
   'comment-outline': MdComment,
@@ -16,36 +17,39 @@ const icons: { [key: string]: any } = {
   'share-outline': MdShare
 };
 
-type IconButtonProps = {
-  icon: string;
+interface IconButtonProps {
+  icon: keyof typeof icons;
   number?: number | string;
   onClick?: () => void;
-  backgroundColor?: string;
   color?: string;
   isPressed?: boolean;
-};
+}
 
 export const IconButton = ({
   icon,
   number,
   onClick,
-  backgroundColor,
   color = 'gray',
   isPressed = false
 }: IconButtonProps) => {
-  const pressedStyle = isPressed ? { opacity: 0.5 } : {};
   const IconComponent = icons[icon];
 
   return (
-    <button
+    <Button
       onClick={onClick}
-      className="icon-button"
-      style={{ backgroundColor, ...pressedStyle }}
+      variant="ghost"
+      size="sm"
+      className={cn(
+        'flex items-center gap-1 px-2 hover:bg-transparent',
+        isPressed && 'opacity-50'
+      )}
     >
-      <IconContext.Provider value={{ size: '12px', color }}>
-        {IconComponent ? <IconComponent style={{ marginRight: 5 }} /> : null}
+      <IconContext.Provider value={{ size: '18px', color }}>
+        {IconComponent && <IconComponent />}
       </IconContext.Provider>
-      <span className="icon-button-text">{number}</span>
-    </button>
+      {number !== undefined && (
+        <span className="text-xs text-muted-foreground">{number}</span>
+      )}
+    </Button>
   );
 };
