@@ -14,6 +14,7 @@ interface GetPostsParams {
   limit?: number;
   sortField?: string;
   sortOrder?: 'asc' | 'desc';
+  userIds?: string[];
 }
 
 const getPosts = async (
@@ -30,6 +31,9 @@ const getPosts = async (
   if (params?.sortField) searchParams.append('sortField', params.sortField);
   if (params?.sortOrder)
     searchParams.append('sortOrder', params.sortOrder.toString());
+  if (params?.userIds && params.userIds.length > 0) {
+    params.userIds.forEach((id) => searchParams.append('userIds', id));
+  }
 
   const response = await fetch(
     `${API_URL}/posts${
