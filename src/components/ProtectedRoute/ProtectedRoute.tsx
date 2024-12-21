@@ -1,13 +1,15 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 
-export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { authToken } = useAuth();
+export const ProtectedRoute = ({
+  children
+}: {
+  children: React.ReactElement;
+}) => {
+  const { isAuthenticated } = useAuth() as any;
   const location = useLocation();
 
-  console.log('authToken protected route', authToken);
-
-  if (!authToken) {
+  if (!isAuthenticated) {
     return <Navigate to="/signIn" state={{ from: location }} replace />;
   }
 
