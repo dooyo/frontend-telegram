@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { register } from '@/lib/api/auth';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
-import { Avatar } from '@files-ui/react';
+import { Avatar } from 'files-ui-react-19';
 import { Link } from '@/components/Link/Link';
 import avatarPlaceholder from '@/assets/avatarPlaceholder.svg';
 

@@ -5,7 +5,7 @@ import { likePost, dislikePost } from '@/lib/api/posts';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '../IconButton/IconButton';
 import { PostType, UserType } from '@/lib/types';
-import { Avatar } from '@files-ui/react';
+import { Avatar } from 'files-ui-react-19';
 
 export const Post: FC<{ post: PostType }> = ({ post }) => {
   const queryClient = useQueryClient();

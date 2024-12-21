@@ -5,7 +5,7 @@ import { likeComment, dislikeComment } from '@/lib/api/posts';
 import { CommentType, UserType } from '@/lib/types';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '@/components/IconButton/IconButton';
-import { Avatar } from '@files-ui/react';
+import { Avatar } from 'files-ui-react-19';
 
 type PropsType = {
   comment: CommentType;

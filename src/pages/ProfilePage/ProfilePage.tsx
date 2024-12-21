@@ -10,7 +10,7 @@ import {
 } from '@/lib/api/followers';
 import { timeDurationCalculator, timeUntil } from '@/lib/helpers/timeCompute';
 import { Button } from '@/components/Button/Button';
-import { Avatar } from '@files-ui/react';
+import { Avatar } from 'files-ui-react-19';
 import { useParams } from 'react-router-dom';
 import { Container } from '@/components/ui/container';
 

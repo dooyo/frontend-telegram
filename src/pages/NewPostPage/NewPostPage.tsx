@@ -7,7 +7,7 @@ import { UserType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar } from '@files-ui/react';
+import { Avatar } from 'files-ui-react-19';
 import { cn } from '@/lib/utils/cn';
 
 const MAX_CHARS = 280;

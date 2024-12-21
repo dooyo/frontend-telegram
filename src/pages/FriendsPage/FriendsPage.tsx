@@ -6,7 +6,7 @@ import {
 } from '@/lib/api/followers';
 import { Following } from '@/lib/types';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar } from '@files-ui/react';
+import { Avatar } from 'files-ui-react-19';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
 import { MdAdd } from 'react-icons/md';

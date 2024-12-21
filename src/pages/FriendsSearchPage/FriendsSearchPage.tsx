@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProfilesSearch } from '@/lib/api/profiles';
 import { UserType } from '@/lib/types';
-import { Avatar } from '@files-ui/react';
+import { Avatar } from 'files-ui-react-19';
 import { Input } from '@/components/Input/Input';
 import { Container } from '@/components/ui/container';
 
