@@ -1,14 +1,14 @@
 // TODO: shared types with backend
 
-export type UserType = {
+export interface UserType {
   _id: string;
-  email: string;
   username: string;
+  email: string;
   avatarUrl?: string;
-  expiresAt: string;
-};
+  expiresAt?: string;
+}
 
-export type UserStatsType = {
+export interface UserStatsType {
   totalComments: number;
   totalCommentsLikes: number;
   totalCommentsDislikes: number;
@@ -17,39 +17,37 @@ export type UserStatsType = {
   totalPostsLikes: number;
   totalPostsDislikes: number;
   totalPostsDuration: number;
-};
+}
 
-export type PostType = {
+export interface PostType {
   _id: string;
-  user: UserType;
-  createdAt: string;
-  image?: string;
-  numberOfComments?: number;
-  numberOfRetweets?: number;
-  numberOfLikes?: number;
-  impressions?: number;
   text: string;
-  comments: CommentType[];
+  user: UserType;
   likes: string[];
   dislikes: string[];
+  commentedBy: string[];
+  commentCount: number;
   expiresAt: string;
-  reactions: string[];
-};
-
-export type CommentType = {
-  _id: string;
-  user: UserType;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommentType {
+  _id: string;
   text: string;
-  likes: string[];
-  dislikes: string[];
-  expiresAt: string;
+  user: UserType;
   post: string;
-};
+  likes: string[];
+  dislikes: string[];
+  expiresAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-export type Following = {
+export interface Following {
   _id: string;
   user: UserType;
   followerUser: UserType;
   createdAt: string;
-};
+  updatedAt: string;
+}

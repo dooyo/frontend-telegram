@@ -106,13 +106,6 @@ export const Post: FC<{ post: PostType }> = ({ post }) => {
           <p className="mt-2 text-foreground break-words whitespace-pre-wrap">
             {post.text}
           </p>
-          {post.image && (
-            <img
-              src={post.image}
-              alt="Post content"
-              className="mt-3 rounded-lg max-h-96 w-full object-cover"
-            />
-          )}
         </div>
       </div>
       <div
@@ -121,7 +114,7 @@ export const Post: FC<{ post: PostType }> = ({ post }) => {
       >
         <IconButton
           icon="comment-outline"
-          number={post.comments.length}
+          number={post.commentCount}
           onClick={() => navigate(`/post/${post._id}`)}
         />
         <IconButton

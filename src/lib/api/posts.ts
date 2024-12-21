@@ -1,16 +1,53 @@
 import { API_URL } from './config';
 import { getAuthToken } from './auth';
+import { PostType } from '@/lib/types';
 
-const getPosts = async () => {
-  const response = await fetch(`${API_URL}/posts`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
+interface PaginatedResponse<T> {
+  data: T[];
+  nextCursor?: string;
+  total: number;
+  hasMore: boolean;
+}
+
+interface GetPostsParams {
+  cursor?: string;
+  limit?: number;
+  sortField?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+const getPosts = async (
+  params?: GetPostsParams
+): Promise<PaginatedResponse<PostType>> => {
+  const authToken = await getAuthToken();
+  if (!authToken) {
+    return { data: [], total: 0, hasMore: false };
+  }
+
+  const searchParams = new URLSearchParams();
+  if (params?.cursor) searchParams.append('cursor', params.cursor);
+  if (params?.limit) searchParams.append('limit', params.limit.toString());
+  if (params?.sortField) searchParams.append('sortField', params.sortField);
+  if (params?.sortOrder)
+    searchParams.append('sortOrder', params.sortOrder.toString());
+
+  const response = await fetch(
+    `${API_URL}/posts${
+      searchParams.toString() ? `?${searchParams.toString()}` : ''
+    }`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: authToken,
+        'Content-Type': 'application/json'
+      }
     }
-  });
+  );
+
   if (response.status !== 200) {
     throw new Error('Failed to fetch posts');
   }
+
   return response.json();
 };
 
