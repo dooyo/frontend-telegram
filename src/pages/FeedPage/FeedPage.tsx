@@ -5,7 +5,7 @@ import { getMyFollowings } from '@/lib/api/followers';
 import { Post } from '@/components/Post/Post';
 import { Link } from 'react-router-dom';
 import { PostType } from '@/lib/types';
-import { PenSquare, Users, Hourglass } from 'lucide-react';
+import { PenSquare, Users, Hourglass, RotateCw } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { cn } from '@/lib/utils/cn';
@@ -154,8 +154,15 @@ export const FeedPage: FC = () => {
             <Hourglass className="w-4 h-4" />
             Fading
           </Button>
-          <Button onClick={onRefresh} disabled={isRefreshing} variant="default">
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          <Button
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            variant="outline"
+            size="icon"
+            className={cn('ml-auto', isRefreshing && 'animate-spin')}
+            aria-label="Refresh posts"
+          >
+            <RotateCw className="w-4 h-4" />
           </Button>
         </div>
 
