@@ -5,16 +5,18 @@ import { getMyFollowings } from '@/lib/api/followers';
 import { Post } from '@/components/Post/Post';
 import { Link } from 'react-router-dom';
 import { PostType } from '@/lib/types';
-import { PenSquare, Users } from 'lucide-react';
+import { PenSquare, Users, Hourglass } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { cn } from '@/lib/utils/cn';
 
 const POSTS_PER_PAGE = 20;
 
+type FilterType = 'none' | 'frens' | 'fading';
+
 export const FeedPage: FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showOnlyFriends, setShowOnlyFriends] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('none');
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // Query to get following users
@@ -40,16 +42,17 @@ export const FeedPage: FC = () => {
     error,
     refetch
   } = useInfiniteQuery({
-    queryKey: ['posts', showOnlyFriends, followingIds],
+    queryKey: ['posts', activeFilter, followingIds],
     queryFn: ({ pageParam }) => {
       const params = {
         cursor: pageParam,
         limit: POSTS_PER_PAGE,
-        sortField: 'createdAt',
-        sortOrder: 'desc' as const
+        sortField: activeFilter === 'fading' ? 'expiresAt' : 'createdAt',
+        sortOrder:
+          activeFilter === 'fading' ? 'asc' : ('desc' as 'asc' | 'desc')
       };
 
-      if (showOnlyFriends && followingIds.length > 0) {
+      if (activeFilter === 'frens' && followingIds.length > 0) {
         return getPosts({ ...params, userIds: followingIds });
       }
 
@@ -58,13 +61,21 @@ export const FeedPage: FC = () => {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
-    enabled: !showOnlyFriends || (showOnlyFriends && followingIds.length > 0)
+    enabled:
+      activeFilter !== 'frens' ||
+      (activeFilter === 'frens' && followingIds.length > 0)
   });
 
   const onRefresh = async () => {
     setIsRefreshing(true);
     await refetch();
     setIsRefreshing(false);
+  };
+
+  const handleFilterClick = (filter: FilterType) => {
+    setActiveFilter((currentFilter) =>
+      currentFilter === filter ? 'none' : filter
+    );
   };
 
   // Intersection Observer callback
@@ -122,22 +133,33 @@ export const FeedPage: FC = () => {
       <div className="flex flex-col items-center w-full">
         <div className="flex gap-2 mt-4 mb-4">
           <Button
-            onClick={() => setShowOnlyFriends(!showOnlyFriends)}
-            variant={showOnlyFriends ? 'default' : 'outline'}
+            onClick={() => handleFilterClick('frens')}
+            variant={activeFilter === 'frens' ? 'default' : 'outline'}
             className={cn(
               'flex items-center gap-2',
-              showOnlyFriends && 'bg-primary text-primary-foreground'
+              activeFilter === 'frens' && 'bg-primary text-primary-foreground'
             )}
           >
             <Users className="w-4 h-4" />
             Frens
+          </Button>
+          <Button
+            onClick={() => handleFilterClick('fading')}
+            variant={activeFilter === 'fading' ? 'default' : 'outline'}
+            className={cn(
+              'flex items-center gap-2',
+              activeFilter === 'fading' && 'bg-primary text-primary-foreground'
+            )}
+          >
+            <Hourglass className="w-4 h-4" />
+            Fading
           </Button>
           <Button onClick={onRefresh} disabled={isRefreshing} variant="default">
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
         </div>
 
-        {showOnlyFriends && followingIds.length === 0 ? (
+        {activeFilter === 'frens' && followingIds.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             You're not following anyone yet. Follow some users to see their
             posts here!
