@@ -1,16 +1,21 @@
-import { type FC } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { likePost, dislikePost } from '@/lib/api/posts';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '../IconButton/IconButton';
 import { PostType, UserType } from '@/lib/types';
 import { Avatar } from 'files-ui-react-19';
+import { ShareModal } from '../ShareModal/ShareModal';
 
-export const Post: FC<{ post: PostType }> = ({ post }) => {
-  const queryClient = useQueryClient();
+type PropsType = {
+  post: PostType;
+};
+
+export const Post = ({ post }: PropsType) => {
+  const [showShareModal, setShowShareModal] = useState(false);
   const navigate = useNavigate();
-  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
+  const queryClient = useQueryClient();
 
   const { mutateAsync: likePostMutation, isPending: isLikePending } =
     useMutation({
@@ -46,18 +51,23 @@ export const Post: FC<{ post: PostType }> = ({ post }) => {
     }
   };
 
-  const handlePostClick = () => navigate(`/post/${post._id}`);
+  const handlePostClick = () => {
+    navigate(`/post/${post._id}`);
+  };
+
   const handleUserClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigate(`/profile/${post.user._id}`);
   };
 
+  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
+
   return (
-    <div
-      className="bg-card rounded-lg border border-input-border p-4 hover:bg-muted/50 transition-colors cursor-pointer"
-      onClick={handlePostClick}
-    >
-      <div className="flex items-start gap-3">
+    <>
+      <div
+        className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-sm cursor-pointer"
+        onClick={handlePostClick}
+      >
         <Avatar
           src={
             post.user.avatarUrl
@@ -136,8 +146,17 @@ export const Post: FC<{ post: PostType }> = ({ post }) => {
           onClick={handleDislikePost}
           isPressed={isDislikePending}
         />
-        <IconButton icon="share-outline" onClick={() => {}} />
+        <IconButton
+          icon="share-outline"
+          onClick={() => setShowShareModal(true)}
+        />
       </div>
-    </div>
+      {showShareModal && (
+        <ShareModal
+          postId={post._id}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
+    </>
   );
 };

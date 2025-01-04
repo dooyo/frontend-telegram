@@ -7,5 +7,9 @@ import { Root } from '@/components/Root';
 import './mockEnv.ts';
 
 import './index.css';
+import { init, initData } from '@telegram-apps/sdk-react';
+
+init();
+initData.restore();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<Root />);
