@@ -5,12 +5,16 @@ import {
   useEffect,
   PropsWithChildren
 } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { UserType } from '@/lib/types';
+import { authTgUser } from '@/lib/api/auth';
+import { initData, useSignal } from '@telegram-apps/sdk-react';
 
 interface AuthContextProps {
   authToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  user: UserType | null;
   updateAuthToken: (newToken: string) => void;
   removeAuthToken: () => void;
   updateMe: (me: UserType) => void;
@@ -20,37 +24,54 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const [authToken, setAuthToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [user, setUser] = useState<UserType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const initDataRaw = useSignal(initData.raw);
 
   useEffect(() => {
-    const existingToken = localStorage.getItem('authToken');
-    console.log('existingToken', existingToken);
-    if (existingToken) {
-      setAuthToken(existingToken);
-    }
-    setLoading(false);
-  }, []);
+    const initAuth = async () => {
+      try {
+        const existingToken = localStorage.getItem('authToken');
+        const existingUser = localStorage.getItem('me');
 
-  useEffect(() => {
-    if (loading) return;
-
-    if (location.pathname.startsWith('/signUp')) return;
-    if (location.pathname.startsWith('/otp')) return;
-    if (!authToken) {
-      console.log('No token... redirecting to /signIn', authToken);
-      navigate('/signIn');
-    } else {
-      const decodedToken = jwtDecode<{ exp: number }>(authToken);
-      console.log('decodedToken', decodedToken);
-      if (decodedToken.exp && Date.now() >= decodedToken.exp * 1000) {
-        console.log('Token expired... resetting', authToken);
+        if (existingToken && existingUser) {
+          const decodedToken = jwtDecode<{ exp: number }>(existingToken);
+          if (decodedToken.exp && Date.now() < decodedToken.exp * 1000) {
+            setAuthToken(existingToken);
+            setUser(JSON.parse(existingUser));
+          } else {
+            // Token expired, try to re-authenticate
+            if (!initDataRaw) {
+              throw new Error('No Telegram init data available');
+            }
+            const { authToken: newToken, user: newUser } = await authTgUser(
+              initDataRaw
+            );
+            setAuthToken(newToken);
+            setUser(newUser);
+          }
+        } else {
+          console.log('No existing auth, try to authenticate with Telegram');
+          // No existing auth, try to authenticate with Telegram
+          if (!initDataRaw) {
+            throw new Error('No Telegram init data available');
+          }
+          const { authToken: newToken, user: newUser } = await authTgUser(
+            initDataRaw
+          );
+          setAuthToken(newToken);
+          setUser(newUser);
+        }
+      } catch (error) {
+        console.error('Authentication failed:', error);
         removeAuthToken();
-        navigate('/signIn');
+      } finally {
+        setIsLoading(false);
       }
-    }
-  }, [location.pathname, authToken, navigate, loading]);
+    };
+
+    initAuth();
+  }, [initDataRaw]);
 
   const updateAuthToken = (newToken: string) => {
     localStorage.setItem('authToken', newToken);
@@ -59,20 +80,31 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const updateMe = (me: UserType) => {
     localStorage.setItem('me', JSON.stringify(me));
+    setUser(me);
   };
 
   const removeAuthToken = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('me');
     setAuthToken(null);
+    setUser(null);
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>; // or some loading spinner
   }
 
   return (
     <AuthContext.Provider
-      value={{ authToken, updateAuthToken, removeAuthToken, updateMe }}
+      value={{
+        authToken,
+        isAuthenticated: !!authToken,
+        isLoading,
+        user,
+        updateAuthToken,
+        removeAuthToken,
+        updateMe
+      }}
     >
       {children}
     </AuthContext.Provider>

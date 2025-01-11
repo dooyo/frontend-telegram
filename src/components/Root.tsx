@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { routes } from '@/navigation/routes.tsx';
 import { AppLayout } from '@/components/AppLayout/AppLayout';
 import { useLaunchParams } from '@telegram-apps/sdk-react';
@@ -35,15 +35,26 @@ const DeepLinkHandler: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const lp = useLaunchParams();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
+    if (isLoading) return;
+
     const handled = sessionStorage.getItem('handled_deep_link');
-    if (lp.startParam?.startsWith('post_') && !handled) {
+    if (isAuthenticated && lp.startParam?.startsWith('post_') && !handled) {
       const postId = lp.startParam.replace('post_', '');
       navigate(`/post/${postId}`);
       sessionStorage.setItem('handled_deep_link', 'true');
     }
-  }, [lp.startParam, navigate]);
+  }, [lp.startParam, navigate, isAuthenticated, isLoading]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return <>{children}</>;
 };

@@ -32,7 +32,7 @@ const getPosts = async (
   if (params?.sortOrder)
     searchParams.append('sortOrder', params.sortOrder.toString());
   if (params?.userIds && params.userIds.length > 0) {
-    params.userIds.forEach((id) => searchParams.append('userIds', id));
+    searchParams.append('userIds', JSON.stringify(params.userIds));
   }
 
   const response = await fetch(

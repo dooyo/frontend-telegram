@@ -79,3 +79,34 @@ export const register = async (data: {
     throw new Error((await response.json()).message ?? 'Failed to register');
   }
 };
+
+export const authTgUser = async (rawInitData: string) => {
+  if (!rawInitData) {
+    throw new Error('No Telegram init data available');
+  }
+
+  const response = await fetch(`${AUTH_API_URL}/auth/login/telegram`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ rawInitData })
+  });
+
+  if (response.status !== 200 && response.status !== 201) {
+    throw new Error(
+      (await response.json()).message ?? 'Failed to verify telegram user'
+    );
+  }
+
+  const { authToken, user } = await response.json();
+
+  if (!authToken) {
+    throw new Error('Failed to verify telegram user');
+  }
+
+  localStorage.setItem('authToken', authToken);
+  localStorage.setItem('me', JSON.stringify(user));
+
+  return { authToken, user };
+};
