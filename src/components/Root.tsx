@@ -41,10 +41,16 @@ const DeepLinkHandler: React.FC<{ children: React.ReactNode }> = ({
     if (isLoading) return;
 
     const handled = sessionStorage.getItem('handled_deep_link');
-    if (isAuthenticated && lp.startParam?.startsWith('post_') && !handled) {
-      const postId = lp.startParam.replace('post_', '');
-      navigate(`/post/${postId}`);
-      sessionStorage.setItem('handled_deep_link', 'true');
+    if (isAuthenticated && !handled && lp.startParam) {
+      if (lp.startParam.startsWith('post_')) {
+        const postId = lp.startParam.replace('post_', '');
+        navigate(`/post/${postId}`);
+        sessionStorage.setItem('handled_deep_link', 'true');
+      } else if (lp.startParam.startsWith('profile_')) {
+        const userId = lp.startParam.replace('profile_', '');
+        navigate(`/profile/${userId}`);
+        sessionStorage.setItem('handled_deep_link', 'true');
+      }
     }
   }, [lp.startParam, navigate, isAuthenticated, isLoading]);
 

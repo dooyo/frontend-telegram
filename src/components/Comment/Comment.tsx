@@ -20,6 +20,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
       mutationFn: likeComment,
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['post', comment.post] });
+        queryClient.invalidateQueries({ queryKey: ['comments', comment.post] });
       }
     });
 
@@ -28,6 +29,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
       mutationFn: dislikeComment,
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['post', comment.post] });
+        queryClient.invalidateQueries({ queryKey: ['comments', comment.post] });
       }
     });
 

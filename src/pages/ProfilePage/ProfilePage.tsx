@@ -13,6 +13,8 @@ import { Button } from '@/components/Button/Button';
 import { Avatar } from 'files-ui-react-19';
 import { useParams } from 'react-router-dom';
 import { Container } from '@/components/ui/container';
+import { ShareModal } from '@/components/ShareModal/ShareModal';
+import { Share } from 'lucide-react';
 
 export const ProfilePage: React.FC = () => {
   const { removeAuthToken } = useAuth() as any;
@@ -20,6 +22,7 @@ export const ProfilePage: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isUserFollowing, setIsUserFollowing] = useState(false);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const { data: me, isLoading: isLoadingMe } = useQuery<UserType>({
     queryKey: ['me'],
@@ -147,7 +150,19 @@ export const ProfilePage: React.FC = () => {
 
         <div className="flex-grow space-y-6 max-w-2xl">
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold">{displayData?.username}</h1>
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="text-2xl font-semibold truncate">
+                {displayData?.username}
+              </h1>
+              <Button
+                onClick={() => setShowShareModal(true)}
+                className="flex items-center gap-2 shrink-0"
+                disabled={false}
+              >
+                <Share className="w-4 h-4" />
+                Share
+              </Button>
+            </div>
             <p className="text-muted-foreground">{displayData?.email}</p>
             <p className="text-sm">
               Expires in:{' '}
@@ -206,6 +221,9 @@ export const ProfilePage: React.FC = () => {
           </div>
         </div>
       </div>
+      {showShareModal && (
+        <ShareModal userId={userId} onClose={() => setShowShareModal(false)} />
+      )}
     </Container>
   );
 };

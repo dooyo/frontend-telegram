@@ -3,15 +3,29 @@ import { Button } from '@/components/ui/button';
 import { Copy, Check } from 'lucide-react';
 
 interface ShareModalProps {
-  postId: string;
+  postId?: string;
+  userId?: string;
   onClose: () => void;
 }
 
-export const ShareModal: React.FC<ShareModalProps> = ({ postId, onClose }) => {
+export const ShareModal: React.FC<ShareModalProps> = ({
+  postId,
+  userId,
+  onClose
+}) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
-    const link = `https://t.me/dooyoappbot/app?startapp=post_${postId}`;
+    let link;
+    if (postId) {
+      link = `https://t.me/dooyoappbot/app?startapp=post_${postId}`;
+    } else if (userId) {
+      link = `https://t.me/dooyoappbot/app?startapp=profile_${userId}`;
+    } else {
+      console.error('Either postId or userId must be provided');
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
@@ -27,7 +41,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({ postId, onClose }) => {
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-card p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
-        <h2 className="text-lg font-semibold mb-4">Share Post</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Share {postId ? 'Post' : 'Profile'}
+        </h2>
         <Button
           onClick={handleCopyLink}
           className="w-full flex items-center justify-center gap-2"
