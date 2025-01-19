@@ -5,7 +5,7 @@ export interface NotificationType {
   _id: string;
   title: string;
   content: string;
-  type: 'follow' | 'like' | 'comment' | 'system';
+  type: 'follow' | 'like' | 'comment' | 'system' | 'fren_post';
   isRead: boolean;
   createdAt: string;
   metadata?: {

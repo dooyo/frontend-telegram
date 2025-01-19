@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Bell, Heart, MessageCircle, UserPlus } from 'lucide-react';
+import { Bell, Heart, MessageCircle, UserPlus, PenSquare } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -8,17 +8,20 @@ import { NotificationType } from '@/lib/api/notifications';
 interface NotificationItemProps {
   notification: NotificationType;
   onRead: (id: string) => void;
+  onOpenChange: (open: boolean) => void;
 }
 
 const notificationIcons = {
   like: Heart,
   comment: MessageCircle,
-  follow: UserPlus
+  follow: UserPlus,
+  fren_post: PenSquare
 } as const;
 
 export const NotificationItem: FC<NotificationItemProps> = ({
   notification,
-  onRead
+  onRead,
+  onOpenChange
 }) => {
   const navigate = useNavigate();
 
@@ -47,6 +50,7 @@ export const NotificationItem: FC<NotificationItemProps> = ({
       const startappParam = new URL(url).searchParams.get('startapp');
       if (startappParam) {
         const [type, id] = startappParam.split('_');
+        onOpenChange(false); // Close modal before navigation
         navigate(`/${type}/${id}`);
       }
     }
@@ -69,7 +73,8 @@ export const NotificationItem: FC<NotificationItemProps> = ({
             'h-5 w-5',
             notification.type.toLowerCase() === 'like' && 'text-red-500',
             notification.type.toLowerCase() === 'comment' && 'text-blue-500',
-            notification.type.toLowerCase() === 'follow' && 'text-green-500'
+            notification.type.toLowerCase() === 'follow' && 'text-green-500',
+            notification.type.toLowerCase() === 'fren_post' && 'text-purple-500'
           )}
         />
       </div>

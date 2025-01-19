@@ -127,6 +127,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
             onRefresh={handleRefresh}
             onNotificationRead={handleNotificationRead}
             isRefreshing={isRefreshing}
+            onOpenChange={onOpenChange}
           />
         </div>
       </SheetContent>

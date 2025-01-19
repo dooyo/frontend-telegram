@@ -13,6 +13,7 @@ interface NotificationsListProps {
   onRefresh: () => void;
   onNotificationRead: (id: string) => void;
   isRefreshing: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export const NotificationsList: FC<NotificationsListProps> = ({
@@ -22,7 +23,8 @@ export const NotificationsList: FC<NotificationsListProps> = ({
   hasNextPage,
   onLoadMore,
   onRefresh,
-  onNotificationRead
+  onNotificationRead,
+  onOpenChange
 }) => {
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -82,6 +84,7 @@ export const NotificationsList: FC<NotificationsListProps> = ({
           key={notification._id}
           notification={notification}
           onRead={() => onNotificationRead(notification._id)}
+          onOpenChange={onOpenChange}
         />
       ))}
 
