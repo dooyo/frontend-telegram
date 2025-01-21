@@ -27,6 +27,7 @@ export interface PostType {
   dislikes: string[];
   commentedBy: string[];
   commentCount: number;
+  reactions: string[];
   expiresAt: string;
   createdAt: string;
   updatedAt: string;
@@ -39,6 +40,7 @@ export interface CommentType {
   post: string;
   likes: string[];
   dislikes: string[];
+  reactions: string[];
   expiresAt: string;
   createdAt: string;
   updatedAt: string;

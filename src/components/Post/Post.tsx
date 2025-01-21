@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { likePost, dislikePost } from '@/lib/api/posts';
 import { timeUntil } from '@/lib/helpers/timeCompute';
-import { IconButton } from '../IconButton/IconButton';
+import { IconButton } from '@/components/IconButton/IconButton';
 import { PostType, UserType } from '@/lib/types';
 import { Avatar } from 'files-ui-react-19';
-import { ShareModal } from '../ShareModal/ShareModal';
+import { ShareModal } from '@/components/ShareModal/ShareModal';
+import { ClockFountain } from '@/components/ClockFountain/ClockFountain';
 
 type PropsType = {
   post: PostType;
@@ -14,19 +15,26 @@ type PropsType = {
 
 export const Post = ({ post }: PropsType) => {
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showLikeAnimation, setShowLikeAnimation] = useState(false);
+  const [showDislikeAnimation, setShowDislikeAnimation] = useState(false);
+  const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
+  const likeButtonRef = useRef<HTMLDivElement>(null);
+  const dislikeButtonRef = useRef<HTMLDivElement>(null);
+  const clockButtonRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { mutateAsync: likePostMutation, isPending: isLikePending } =
-    useMutation({
+  const { mutateAsync: likePostMutate, isPending: isLikePending } = useMutation(
+    {
       mutationFn: likePost,
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['post', post._id] });
         queryClient.invalidateQueries({ queryKey: ['posts'] });
       }
-    });
+    }
+  );
 
-  const { mutateAsync: dislikePostMutation, isPending: isDislikePending } =
+  const { mutateAsync: dislikePostMutate, isPending: isDislikePending } =
     useMutation({
       mutationFn: dislikePost,
       onSuccess: () => {
@@ -35,9 +43,25 @@ export const Post = ({ post }: PropsType) => {
       }
     });
 
+  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
+  const hasReacted = post.reactions.includes(me._id);
+
   const handleLikePost = async () => {
     try {
-      await likePostMutation(post._id);
+      if (!hasReacted) {
+        const rect = clockButtonRef.current?.getBoundingClientRect();
+        if (rect) {
+          setAnimationPosition({
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
+          });
+        }
+        setShowLikeAnimation(true);
+      }
+      await likePostMutate(post._id as any);
+      if (!hasReacted) {
+        setTimeout(() => setShowLikeAnimation(false), 1000);
+      }
     } catch (error) {
       console.error(`Failed to like post ${post._id}:`, error);
     }
@@ -45,7 +69,20 @@ export const Post = ({ post }: PropsType) => {
 
   const handleDislikePost = async () => {
     try {
-      await dislikePostMutation(post._id);
+      if (!hasReacted) {
+        const rect = clockButtonRef.current?.getBoundingClientRect();
+        if (rect) {
+          setAnimationPosition({
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
+          });
+        }
+        setShowDislikeAnimation(true);
+      }
+      await dislikePostMutate(post._id as any);
+      if (!hasReacted) {
+        setTimeout(() => setShowDislikeAnimation(false), 1000);
+      }
     } catch (error) {
       console.error(`Failed to dislike post ${post._id}:`, error);
     }
@@ -59,8 +96,6 @@ export const Post = ({ post }: PropsType) => {
     e.stopPropagation();
     navigate(`/profile/${post.user._id}`);
   };
-
-  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
 
   return (
     <>
@@ -127,25 +162,27 @@ export const Post = ({ post }: PropsType) => {
           number={post.commentCount}
           onClick={() => navigate(`/post/${post._id}`)}
         />
-        <IconButton
-          icon="clock-outline"
-          number={timeUntil(post.expiresAt)}
-          onClick={() => console.log('clicked on clock')}
-        />
-        <IconButton
-          icon="heart-outline"
-          number={post.likes.length}
-          color={post.likes.includes(me._id) ? 'red' : 'grey'}
-          onClick={handleLikePost}
-          isPressed={isLikePending}
-        />
-        <IconButton
-          icon="heart-off-outline"
-          number={post.dislikes.length}
-          color={post.dislikes.includes(me._id) ? 'red' : 'grey'}
-          onClick={handleDislikePost}
-          isPressed={isDislikePending}
-        />
+        <div ref={clockButtonRef}>
+          <IconButton icon="clock-outline" number={timeUntil(post.expiresAt)} />
+        </div>
+        <div ref={likeButtonRef}>
+          <IconButton
+            icon="heart-outline"
+            number={post.likes.length}
+            color={post.likes.includes(me._id) ? 'red' : 'grey'}
+            onClick={handleLikePost}
+            isPressed={isLikePending}
+          />
+        </div>
+        <div ref={dislikeButtonRef}>
+          <IconButton
+            icon="heart-off-outline"
+            number={post.dislikes.length}
+            color={post.dislikes.includes(me._id) ? 'red' : 'grey'}
+            onClick={handleDislikePost}
+            isPressed={isDislikePending}
+          />
+        </div>
         <IconButton
           icon="share-outline"
           onClick={() => setShowShareModal(true)}
@@ -155,6 +192,20 @@ export const Post = ({ post }: PropsType) => {
         <ShareModal
           postId={post._id}
           onClose={() => setShowShareModal(false)}
+        />
+      )}
+      {showLikeAnimation && !hasReacted && (
+        <ClockFountain
+          isLiked={true}
+          x={animationPosition.x}
+          y={animationPosition.y}
+        />
+      )}
+      {showDislikeAnimation && !hasReacted && (
+        <ClockFountain
+          isLiked={false}
+          x={animationPosition.x}
+          y={animationPosition.y}
         />
       )}
     </>

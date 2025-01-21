@@ -46,7 +46,6 @@ export const verifyOtp = async (data: { email: string; otp: string }) => {
   }
 
   const authToken = (await response.json())?.authToken;
-  console.log('authToken', authToken);
 
   if (!authToken) {
     throw new Error('Failed to verify OTP');

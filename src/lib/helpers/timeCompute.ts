@@ -1,28 +1,21 @@
+import { differenceInSeconds } from 'date-fns';
+
 export function timeUntil(date: string) {
-  const now = new Date();
   const then = new Date(date);
-  const delta = Math.abs(then.getTime() - now.getTime()) / 1000;
-  const days = Math.floor(delta / 86400);
-  const hours = Math.floor(delta / 3600) % 24;
-  const minutes = Math.floor(delta / 60) % 60;
-  const seconds = Math.floor(delta % 60);
-  if (days > 2) {
-    return `${days}d`;
-  } else if (days > 0) {
-    return `${days}d ${hours}h`;
-  }
-  if (hours > 0) {
-    return `${hours}h`;
-  }
-  if (minutes > 0) {
-    return `${minutes}m`;
-  }
-  return `${seconds}s`;
+  const now = new Date();
+  // return Math.abs(differenceInSeconds(then, now));
+  return timeDurationCalculator(Math.abs(differenceInSeconds(then, now)));
 }
 
 export function timeDurationCalculator(seconds: number): string {
   const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds - days * 86400) / 3600);
-  const minutes = Math.floor((seconds - days * 86400 - hours * 3600) / 60);
-  return `${days}d ${hours}h ${minutes}m`;
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+
+  return parts.join(' ') || '0m';
 }
