@@ -1,12 +1,19 @@
 import React, { useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { likeComment, dislikeComment } from '@/lib/api/posts';
+import { likeComment, dislikeComment, deleteComment } from '@/lib/api/posts';
 import { CommentType, UserType } from '@/lib/types';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '@/components/IconButton/IconButton';
 import { Avatar } from 'files-ui-react-19';
 import { ClockFountain } from '@/components/ClockFountain/ClockFountain';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu';
+import { Flag, Trash2 } from 'lucide-react';
 
 type PropsType = {
   comment: CommentType;
@@ -22,6 +29,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
 
   const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
   const hasReacted = comment.reactions.includes(me._id);
+  const isMyComment = comment.user._id === me._id;
 
   const { mutateAsync: likeCommentMutate, isPending: isLikePending } =
     useMutation({
@@ -40,6 +48,14 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
         queryClient.invalidateQueries({ queryKey: ['comments', comment.post] });
       }
     });
+
+  const { mutateAsync: deleteCommentMutation } = useMutation({
+    mutationFn: deleteComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', comment.post] });
+      queryClient.invalidateQueries({ queryKey: ['post', comment.post] });
+    }
+  });
 
   const handleLikeComment = async () => {
     try {
@@ -81,6 +97,23 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
     } catch (error) {
       console.error(`Failed to dislike comment ${comment._id}:`, error);
     }
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this comment?')) {
+      try {
+        await deleteCommentMutation(comment._id);
+      } catch (error) {
+        console.error('Failed to delete comment:', error);
+      }
+    }
+  };
+
+  const handleReport = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement report functionality
+    alert('Report functionality coming soon!');
   };
 
   const handleUserClick = (e: React.MouseEvent) => {
@@ -126,15 +159,31 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
                 @{comment.user.username}
               </button>
             </div>
-            <button
-              className="text-muted-foreground hover:text-foreground transition-colors px-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log('clicked on dots');
-              }}
-            >
-              •••
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="text-muted-foreground hover:text-foreground transition-colors px-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  •••
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {isMyComment && (
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleReport}>
+                  <Flag className="w-4 h-4 mr-2" />
+                  Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <p className="mt-2 text-foreground break-words whitespace-pre-wrap">
             {comment.text}

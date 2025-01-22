@@ -1,13 +1,20 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { likePost, dislikePost } from '@/lib/api/posts';
+import { likePost, dislikePost, deletePost } from '@/lib/api/posts';
 import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '@/components/IconButton/IconButton';
 import { PostType, UserType } from '@/lib/types';
 import { Avatar } from 'files-ui-react-19';
 import { ShareModal } from '@/components/ShareModal/ShareModal';
 import { ClockFountain } from '@/components/ClockFountain/ClockFountain';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu';
+import { Flag, Trash2 } from 'lucide-react';
 
 type PropsType = {
   post: PostType;
@@ -43,8 +50,16 @@ export const Post = ({ post }: PropsType) => {
       }
     });
 
+  const { mutateAsync: deletePostMutation } = useMutation({
+    mutationFn: deletePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+
   const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
   const hasReacted = post.reactions.includes(me._id);
+  const isMyPost = post.user._id === me._id;
 
   const handleLikePost = async () => {
     try {
@@ -97,6 +112,23 @@ export const Post = ({ post }: PropsType) => {
     navigate(`/profile/${post.user._id}`);
   };
 
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this post?')) {
+      try {
+        await deletePostMutation(post._id);
+      } catch (error) {
+        console.error('Failed to delete post:', error);
+      }
+    }
+  };
+
+  const handleReport = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement report functionality
+    alert('Report functionality coming soon!');
+  };
+
   return (
     <>
       <div
@@ -138,15 +170,31 @@ export const Post = ({ post }: PropsType) => {
                 @{post.user.username}
               </button>
             </div>
-            <button
-              className="text-muted-foreground hover:text-foreground transition-colors px-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log('clicked on dots');
-              }}
-            >
-              •••
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="text-muted-foreground hover:text-foreground transition-colors px-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  •••
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {isMyPost && (
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={handleDelete}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleReport}>
+                  <Flag className="w-4 h-4 mr-2" />
+                  Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <p className="mt-2 text-foreground break-words whitespace-pre-wrap">
             {post.text}

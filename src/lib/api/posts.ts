@@ -201,6 +201,46 @@ const dislikeComment = async (commentId: string) => {
   return response.json();
 };
 
+const deletePost = async (postId: string) => {
+  const authToken = await getAuthToken();
+  if (!authToken) {
+    return;
+  }
+  const response = await fetch(`${API_URL}/posts/${postId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete post');
+  }
+
+  return response.json();
+};
+
+const deleteComment = async (commentId: string) => {
+  const authToken = await getAuthToken();
+  if (!authToken) {
+    return;
+  }
+  const response = await fetch(`${API_URL}/comments/${commentId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete comment');
+  }
+
+  return response.json();
+};
+
 export {
   getPosts,
   getPost,
@@ -209,5 +249,7 @@ export {
   likePost,
   dislikePost,
   likeComment,
-  dislikeComment
+  dislikeComment,
+  deletePost,
+  deleteComment
 };
