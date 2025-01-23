@@ -54,6 +54,7 @@ export const Post = ({ post }: PropsType) => {
     mutationFn: deletePost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      navigate('/');
     }
   });
 
