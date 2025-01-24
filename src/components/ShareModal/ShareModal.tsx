@@ -39,7 +39,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-xs z-50 flex items-center justify-center">
       <div className="bg-card p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
         <h2 className="text-lg font-semibold mb-4">
           Share {postId ? 'Post' : 'Profile'}

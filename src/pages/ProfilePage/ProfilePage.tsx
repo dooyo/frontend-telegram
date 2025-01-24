@@ -121,7 +121,7 @@ export const ProfilePage: React.FC = () => {
   return (
     <Container className="py-8">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {displayData?.avatarUrl ? (
             <div className="relative w-64 h-64 rounded-full overflow-hidden border border-input-border bg-input-background">
               <Avatar
@@ -148,7 +148,7 @@ export const ProfilePage: React.FC = () => {
           )}
         </div>
 
-        <div className="flex-grow space-y-6 max-w-2xl">
+        <div className="grow space-y-6 max-w-2xl">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-4">
               <h1 className="text-2xl font-semibold truncate">

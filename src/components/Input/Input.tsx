@@ -57,7 +57,7 @@ export const Input: FC<InputProps> = ({
       >
         <input
           id={title?.toLowerCase().replace(' ', '-')}
-          className="peer w-full bg-transparent outline-none text-base disabled:opacity-50"
+          className="peer w-full bg-transparent outline-hidden text-base disabled:opacity-50"
           type={inputType}
           placeholder={placeholder}
           value={value}

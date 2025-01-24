@@ -48,7 +48,7 @@ export const SignInPage: React.FC = () => {
         </Button>
 
         <div className="flex items-center justify-center mt-5 w-full gap-2">
-          <div className="flex-grow h-0.5 bg-[#cbc3be]" />
+          <div className="grow h-0.5 bg-[#cbc3be]" />
           <div>
             <p className="text-sm">Don&rsquo;t have an account?</p>
           </div>
@@ -57,7 +57,7 @@ export const SignInPage: React.FC = () => {
               Create an account
             </Link>
           </div>
-          <div className="flex-grow h-0.5 bg-[#cbc3be]" />
+          <div className="grow h-0.5 bg-[#cbc3be]" />
         </div>
       </div>
     </div>

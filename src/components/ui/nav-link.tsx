@@ -17,7 +17,7 @@ export const NavLink = ({ icon, label, className, ...props }: NavLinkProps) => {
       className={({ isActive }) =>
         cn(
           'flex flex-col items-center justify-center w-full h-full transition-colors',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+          'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
           isActive
             ? 'text-primary'
             : 'text-muted-foreground hover:text-primary',

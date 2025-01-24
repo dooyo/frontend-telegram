@@ -133,7 +133,7 @@ export const Post = ({ post }: PropsType) => {
   return (
     <>
       <div
-        className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-sm cursor-pointer"
+        className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-xs cursor-pointer"
         onClick={handlePostClick}
       >
         <Avatar
