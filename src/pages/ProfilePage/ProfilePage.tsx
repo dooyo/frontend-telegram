@@ -3,6 +3,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { UserType } from '@/lib/types';
 import { getMe, getProfileById, getProfileStatsById } from '@/lib/api/profiles';
+import { getPosts } from '@/lib/api/posts';
+import { getUserComments } from '@/lib/api/comments';
 import {
   postFollow,
   isMeFollowingUser,
@@ -11,12 +13,21 @@ import {
 import { timeDurationCalculator, timeUntil } from '@/lib/helpers/timeCompute';
 import { Button } from '@/components/Button/Button';
 import { Avatar } from 'files-ui-react-19';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Container } from '@/components/ui/container';
 import { ShareModal } from '@/components/ShareModal/ShareModal';
 import { Share } from 'lucide-react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion';
+import { Post } from '@/components/Post/Post';
+import { Comment } from '@/components/Comment/Comment';
 
 export const ProfilePage: React.FC = () => {
+  const navigate = useNavigate();
   const { removeAuthToken } = useAuth() as any;
   const { id: userId } = useParams<{ id: string }>();
   const [isFollowing, setIsFollowing] = useState(false);
@@ -46,6 +57,18 @@ export const ProfilePage: React.FC = () => {
     queryFn: () => getProfileStatsById(userId as string),
     enabled: !!userId && userId !== me?._id,
     retry: 2
+  });
+
+  const { data: userPosts, isLoading: isLoadingPosts } = useQuery({
+    queryKey: ['userPosts', userId],
+    queryFn: () => getPosts({ userIds: [userId as string], limit: 5 }),
+    enabled: !!userId
+  });
+
+  const { data: userComments, isLoading: isLoadingComments } = useQuery({
+    queryKey: ['userComments', userId],
+    queryFn: () => getUserComments(userId as string, { limit: 5 }),
+    enabled: !!userId
   });
 
   const { mutateAsync: followMutation, isPending: isFollowPending } =
@@ -147,8 +170,7 @@ export const ProfilePage: React.FC = () => {
             </div>
           )}
         </div>
-
-        <div className="grow space-y-6 max-w-2xl">
+        <div className="w-full space-y-6 max-w-2xl">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-4">
               <h1 className="text-2xl font-semibold truncate">
@@ -173,32 +195,103 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {!isLoadingStats && userStats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <h2 className="font-medium">Comments</h2>
-                <ul className="space-y-1 text-sm">
-                  <li>Total: {userStats.totalComments}</li>
-                  <li>Likes: {userStats.totalCommentsLikes}</li>
-                  <li>Dislikes: {userStats.totalCommentsDislikes}</li>
-                  <li>
-                    Duration:{' '}
-                    {timeDurationCalculator(userStats.totalCommentsDuration)}
-                  </li>
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <h2 className="font-medium">Posts</h2>
-                <ul className="space-y-1 text-sm">
-                  <li>Total: {userStats.totalPosts}</li>
-                  <li>Likes: {userStats.totalPostsLikes}</li>
-                  <li>Dislikes: {userStats.totalPostsDislikes}</li>
-                  <li>
-                    Duration:{' '}
-                    {timeDurationCalculator(userStats.totalPostsDuration)}
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <Accordion type="multiple" className="w-full space-y-4">
+              <AccordionItem value="live-posts">
+                <AccordionTrigger className="text-lg font-medium">
+                  Live Posts
+                  <span className="text-sm text-muted-foreground ml-2">
+                    ({userPosts?.data.length || 0})
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-4">
+                    {isLoadingPosts ? (
+                      <div className="flex justify-center py-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                      </div>
+                    ) : userPosts?.data && userPosts.data.length > 0 ? (
+                      userPosts.data.map((post) => (
+                        <Post key={post._id} post={post} />
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4">
+                        No posts yet
+                      </p>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="live-comments">
+                <AccordionTrigger className="text-lg font-medium">
+                  Live Comments
+                  <span className="text-sm text-muted-foreground ml-2">
+                    ({userComments?.data.length || 0})
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-4">
+                    {isLoadingComments ? (
+                      <div className="flex justify-center py-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                      </div>
+                    ) : userComments?.data && userComments.data.length > 0 ? (
+                      userComments.data.map((comment) => (
+                        <div
+                          key={comment._id}
+                          onClick={() =>
+                            navigate(`/post/${(comment.post as any)._id}`)
+                          }
+                          className="cursor-pointer hover:bg-accent/5"
+                        >
+                          <Comment comment={comment} />
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4">
+                        No comments yet
+                      </p>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="stats">
+                <AccordionTrigger className="text-lg font-medium">
+                  User Statistics
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+                    <div className="space-y-2 rounded-lg p-4 bg-accent/5">
+                      <h2 className="font-medium">Comments</h2>
+                      <ul className="space-y-1 text-sm">
+                        <li>Total: {userStats.totalComments}</li>
+                        <li>Likes: {userStats.totalCommentsLikes}</li>
+                        <li>Dislikes: {userStats.totalCommentsDislikes}</li>
+                        <li>
+                          Duration:{' '}
+                          {timeDurationCalculator(
+                            userStats.totalCommentsDuration
+                          )}
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="space-y-2 rounded-lg p-4 bg-accent/5">
+                      <h2 className="font-medium">Posts</h2>
+                      <ul className="space-y-1 text-sm">
+                        <li>Total: {userStats.totalPosts}</li>
+                        <li>Likes: {userStats.totalPostsLikes}</li>
+                        <li>Dislikes: {userStats.totalPostsDislikes}</li>
+                        <li>
+                          Duration:{' '}
+                          {timeDurationCalculator(userStats.totalPostsDuration)}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           )}
 
           <div className="flex gap-4 items-center">
