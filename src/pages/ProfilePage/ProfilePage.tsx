@@ -5,6 +5,8 @@ import { UserType } from '@/lib/types';
 import { getMe, getProfileById, getProfileStatsById } from '@/lib/api/profiles';
 import { getPosts } from '@/lib/api/posts';
 import { getUserComments } from '@/lib/api/comments';
+import { getTotalRewards, getRewardsHistory } from '@/lib/api/rewards';
+import { calculateTotalLiveRewards } from '@/lib/helpers/rewardCalculator';
 import {
   postFollow,
   isMeFollowingUser,
@@ -16,7 +18,7 @@ import { Avatar } from 'files-ui-react-19';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Container } from '@/components/ui/container';
 import { ShareModal } from '@/components/ShareModal/ShareModal';
-import { Share } from 'lucide-react';
+import { Share, Clock, MessageSquare } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -34,6 +36,7 @@ export const ProfilePage: React.FC = () => {
   const [isUserFollowing, setIsUserFollowing] = useState(false);
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [liveRewards, setLiveRewards] = useState(0);
 
   const { data: me, isLoading: isLoadingMe } = useQuery<UserType>({
     queryKey: ['me'],
@@ -71,6 +74,20 @@ export const ProfilePage: React.FC = () => {
     enabled: !!userId
   });
 
+  const { data: totalRewards } = useQuery({
+    queryKey: ['totalRewards', userId],
+    queryFn: () => getTotalRewards(userId as string),
+    enabled: !!userId && isCurrentUser
+  });
+
+  const { data: rewardsHistory, isLoading: isLoadingRewardsHistory } = useQuery(
+    {
+      queryKey: ['rewardsHistory', userId],
+      queryFn: () => getRewardsHistory(userId as string),
+      enabled: !!userId && isCurrentUser
+    }
+  );
+
   const { mutateAsync: followMutation, isPending: isFollowPending } =
     useMutation({
       mutationFn: postFollow,
@@ -105,6 +122,29 @@ export const ProfilePage: React.FC = () => {
 
     fetchFollowersStatus();
   }, [me, userId]);
+
+  // Update live rewards every second
+  useEffect(() => {
+    if (!isCurrentUser || !userPosts?.data || !userComments?.data) return;
+
+    const activePosts = userPosts.data.filter(
+      (post) => !post.expiresAt || new Date(post.expiresAt) > new Date()
+    );
+    const activeComments = userComments.data.filter(
+      (comment) =>
+        !comment.expiresAt || new Date(comment.expiresAt) > new Date()
+    );
+
+    const calculateAndUpdateLiveRewards = () => {
+      const total = calculateTotalLiveRewards(activePosts, activeComments);
+      setLiveRewards(total);
+    };
+
+    calculateAndUpdateLiveRewards();
+    const interval = setInterval(calculateAndUpdateLiveRewards, 1000);
+
+    return () => clearInterval(interval);
+  }, [isCurrentUser, userPosts?.data, userComments?.data]);
 
   const displayData = isCurrentUser ? me : userData;
   const isLoading = isLoadingMe || (isLoadingUser && !isCurrentUser);
@@ -196,12 +236,84 @@ export const ProfilePage: React.FC = () => {
 
           {!isLoadingStats && userStats && (
             <Accordion type="multiple" className="w-full space-y-4">
+              {isCurrentUser && (
+                <AccordionItem value="rewards">
+                  <AccordionTrigger className="text-lg font-medium">
+                    <span>Rewards</span>
+                    <div className="flex items-center gap-2 ml-auto mr-2">
+                      <span className="text-sm text-muted-foreground">
+                        {((totalRewards?.total || 0) + liveRewards).toFixed(3)}{' '}
+                        TIME
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 p-4">
+                      {/* Live Rewards Section */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium">
+                            Currently Accumulating
+                          </h3>
+                          <span className="text-sm text-muted-foreground">
+                            {liveRewards.toFixed(3)} TIME
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-border my-4"></div>
+
+                      {/* Existing Rewards History Section */}
+                      <h3 className="font-medium">Settled Rewards</h3>
+                      {isLoadingRewardsHistory ? (
+                        <div className="flex justify-center py-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                        </div>
+                      ) : rewardsHistory?.rewards &&
+                        rewardsHistory.rewards.length > 0 ? (
+                        <div className="space-y-3">
+                          {rewardsHistory.rewards.map((reward) => (
+                            <div
+                              key={reward._id}
+                              className="flex items-center justify-between p-3 rounded-lg bg-accent/5"
+                            >
+                              <div className="flex items-center gap-2">
+                                {reward.type === 'POST_LIFETIME' ? (
+                                  <Clock className="w-4 h-4 text-primary" />
+                                ) : (
+                                  <MessageSquare className="w-4 h-4 text-primary" />
+                                )}
+                                <span className="text-sm font-medium">
+                                  {reward.amount.toFixed(3)} TIME
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {timeUntil(reward.contentExpiredAt)} ago from{' '}
+                                  {reward.type === 'POST_LIFETIME'
+                                    ? 'post'
+                                    : 'comment'}{' '}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground text-center py-4">
+                          No settled rewards yet
+                        </p>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
               <AccordionItem value="live-posts">
                 <AccordionTrigger className="text-lg font-medium">
-                  Live Posts
-                  <span className="text-sm text-muted-foreground ml-2">
-                    ({userPosts?.data.length || 0})
-                  </span>
+                  <span>Live Posts</span>
+                  <div className="flex items-center gap-2 ml-auto mr-2">
+                    <span className="text-sm text-muted-foreground">
+                      ({userPosts?.data.length || 0})
+                    </span>
+                  </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
@@ -224,10 +336,12 @@ export const ProfilePage: React.FC = () => {
 
               <AccordionItem value="live-comments">
                 <AccordionTrigger className="text-lg font-medium">
-                  Live Comments
-                  <span className="text-sm text-muted-foreground ml-2">
-                    ({userComments?.data.length || 0})
-                  </span>
+                  <span>Live Comments</span>
+                  <div className="flex items-center gap-2 ml-auto mr-2">
+                    <span className="text-sm text-muted-foreground">
+                      ({userComments?.data.length || 0})
+                    </span>
+                  </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
