@@ -5,13 +5,17 @@ export interface NotificationType {
   _id: string;
   title: string;
   content: string;
-  type: 'follow' | 'like' | 'comment' | 'system' | 'fren_post';
+  type: 'follow' | 'like' | 'comment' | 'system' | 'fren_post' | 'reward';
   isRead: boolean;
   createdAt: string;
   metadata?: {
     postId?: string;
     userId?: string;
     commentId?: string;
+    tgId?: number;
+    rewardId?: string;
+    rewardType?: 'POST_LIFETIME' | 'COMMENT_LIFETIME';
+    amount?: number;
   };
 }
 

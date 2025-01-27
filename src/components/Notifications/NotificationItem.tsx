@@ -1,5 +1,12 @@
 import { FC } from 'react';
-import { Bell, Heart, MessageCircle, UserPlus, PenSquare } from 'lucide-react';
+import {
+  Bell,
+  Heart,
+  MessageCircle,
+  UserPlus,
+  PenSquare,
+  Award
+} from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -15,7 +22,8 @@ const notificationIcons = {
   like: Heart,
   comment: MessageCircle,
   follow: UserPlus,
-  fren_post: PenSquare
+  fren_post: PenSquare,
+  reward: Award
 } as const;
 
 export const NotificationItem: FC<NotificationItemProps> = ({
@@ -74,7 +82,9 @@ export const NotificationItem: FC<NotificationItemProps> = ({
             notification.type.toLowerCase() === 'like' && 'text-red-500',
             notification.type.toLowerCase() === 'comment' && 'text-blue-500',
             notification.type.toLowerCase() === 'follow' && 'text-green-500',
-            notification.type.toLowerCase() === 'fren_post' && 'text-purple-500'
+            notification.type.toLowerCase() === 'fren_post' &&
+              'text-purple-500',
+            notification.type.toLowerCase() === 'reward' && 'text-yellow-500'
           )}
         />
       </div>
