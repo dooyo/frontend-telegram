@@ -1,6 +1,6 @@
 import { FC, useRef, useCallback, useEffect } from 'react';
 import { NotificationItem } from './NotificationItem';
-import { NotificationType } from '@/lib/api/notifications';
+import { NotificationType } from '@/lib/api/types';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 

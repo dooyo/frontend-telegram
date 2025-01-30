@@ -5,12 +5,13 @@ import {
   MessageCircle,
   UserPlus,
   PenSquare,
-  Award
+  Award,
+  AtSign
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { NotificationType } from '@/lib/api/notifications';
+import { NotificationType } from '@/lib/api/types';
 
 interface NotificationItemProps {
   notification: NotificationType;
@@ -23,7 +24,8 @@ const notificationIcons = {
   comment: MessageCircle,
   follow: UserPlus,
   fren_post: PenSquare,
-  reward: Award
+  reward: Award,
+  mention: AtSign
 } as const;
 
 export const NotificationItem: FC<NotificationItemProps> = ({
@@ -84,7 +86,8 @@ export const NotificationItem: FC<NotificationItemProps> = ({
             notification.type.toLowerCase() === 'follow' && 'text-green-500',
             notification.type.toLowerCase() === 'fren_post' &&
               'text-purple-500',
-            notification.type.toLowerCase() === 'reward' && 'text-yellow-500'
+            notification.type.toLowerCase() === 'reward' && 'text-yellow-500',
+            notification.type.toLowerCase() === 'mention' && 'text-blue-500'
           )}
         />
       </div>

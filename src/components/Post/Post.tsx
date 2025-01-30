@@ -15,6 +15,7 @@ import {
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu';
 import { Flag, Trash2 } from 'lucide-react';
+import { ContentText } from '../ContentText/ContentText';
 
 type PropsType = {
   post: PostType;
@@ -197,9 +198,7 @@ export const Post = ({ post }: PropsType) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <p className="mt-2 text-foreground break-words whitespace-pre-wrap">
-            {post.text}
-          </p>
+          <ContentText text={post.text} className="mt-2 text-foreground" />
         </div>
       </div>
       <div

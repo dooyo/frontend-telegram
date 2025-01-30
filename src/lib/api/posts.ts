@@ -1,20 +1,13 @@
 import { API_URL } from './config';
 import { getAuthToken } from './auth';
 import { PostType } from '@/lib/types';
+import { GetPostsParams } from './types';
 
 interface PaginatedResponse<T> {
   data: T[];
   nextCursor?: string;
   total: number;
   hasMore: boolean;
-}
-
-interface GetPostsParams {
-  cursor?: string;
-  limit?: number;
-  sortField?: string;
-  sortOrder?: 'asc' | 'desc';
-  userIds?: string[];
 }
 
 const getPosts = async (
@@ -74,7 +67,10 @@ const getPost = async (id: string) => {
   return response.json();
 };
 
-const postCommentOnPost = async (id: string, data: { text: string }) => {
+const postCommentOnPost = async (
+  id: string,
+  data: { text: string; mentionedUserIds?: string[] }
+) => {
   const authToken = await getAuthToken();
   if (!authToken) {
     return;
@@ -97,7 +93,10 @@ const postCommentOnPost = async (id: string, data: { text: string }) => {
   return response.json();
 };
 
-const createPost = async (data: { text: string }) => {
+const createPost = async (data: {
+  text: string;
+  mentionedUserIds?: string[];
+}) => {
   const authToken = await getAuthToken();
   if (!authToken) {
     return;

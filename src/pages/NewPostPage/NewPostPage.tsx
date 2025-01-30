@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPost } from '@/lib/api/posts';
@@ -6,14 +6,15 @@ import { getMe } from '@/lib/api/profiles';
 import { UserType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
-import { Textarea } from '@/components/ui/textarea';
 import { Avatar } from 'files-ui-react-19';
 import { cn } from '@/lib/utils/cn';
+import { MentionsInput } from '@/components/ui/mentions-input';
 
 const MAX_CHARS = 280;
 
 export const NewPostPage: React.FC = () => {
   const [text, setText] = useState('');
+  const [mentionedUserIds, setMentionedUserIds] = useState<string[]>([]);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -29,27 +30,23 @@ export const NewPostPage: React.FC = () => {
     queryFn: getMe
   });
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
+  const handleTextChange = useCallback((newText: string) => {
     if (newText.length <= MAX_CHARS) {
       setText(newText);
     }
-  };
+  }, []);
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-    const pastedText = e.clipboardData.getData('text');
-    const remainingChars = MAX_CHARS - text.length;
-    const trimmedText = pastedText.slice(0, remainingChars);
-    setText((prev) => prev + trimmedText);
-  };
+  const handleMentionsChange = useCallback((users: string[]) => {
+    setMentionedUserIds(users);
+  }, []);
 
   const handlePost = async () => {
     if (!text.trim()) return;
 
     try {
-      await mutateAsync({ text } as any);
+      await mutateAsync({ text, mentionedUserIds } as any);
       setText('');
+      setMentionedUserIds([]);
       navigate(-1); // Go back to the previous page
     } catch (error) {
       console.error('Failed to post:', error);
@@ -68,7 +65,6 @@ export const NewPostPage: React.FC = () => {
 
   const charsLeft = MAX_CHARS - text.length;
   const isNearLimit = charsLeft <= 20;
-  const isAtLimit = charsLeft === 0;
 
   return (
     <Container className="py-4">
@@ -89,14 +85,15 @@ export const NewPostPage: React.FC = () => {
             readOnly
           />
           <div className="flex-1">
-            <Textarea
+            <MentionsInput
               value={text}
               onChange={handleTextChange}
-              onPaste={handlePaste}
+              onMentionsChange={handleMentionsChange}
               placeholder={`What's on your mind, ${me?.username}?`}
+              maxLength={MAX_CHARS}
               rows={6}
               className={cn(
-                isAtLimit && 'border-destructive focus:ring-destructive'
+                'flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               )}
             />
             <div className="flex justify-between items-center mt-2">

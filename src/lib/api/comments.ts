@@ -1,20 +1,7 @@
 import { API_URL } from './config';
 import { getAuthToken } from './auth';
 import { CommentType } from '@/lib/types';
-
-interface PaginatedResponse<T> {
-  data: T[];
-  nextCursor?: string;
-  total: number;
-  hasMore: boolean;
-}
-
-interface GetCommentsParams {
-  cursor?: string;
-  limit?: number;
-  sortField?: string;
-  sortOrder?: 'asc' | 'desc';
-}
+import { PaginatedResponse, GetCommentsParams } from './types';
 
 export const getPostComments = async (
   postId: string,

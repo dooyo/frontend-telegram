@@ -1,35 +1,10 @@
 import { API_URL } from './config';
 import { getAuthToken } from './auth';
-
-export interface NotificationType {
-  _id: string;
-  title: string;
-  content: string;
-  type: 'follow' | 'like' | 'comment' | 'system' | 'fren_post' | 'reward';
-  isRead: boolean;
-  createdAt: string;
-  metadata?: {
-    postId?: string;
-    userId?: string;
-    commentId?: string;
-    tgId?: number;
-    rewardId?: string;
-    rewardType?: 'POST_LIFETIME' | 'COMMENT_LIFETIME';
-    amount?: number;
-  };
-}
-
-interface PaginatedResponse<T> {
-  data: T[];
-  nextCursor?: string;
-  total: number;
-  hasMore: boolean;
-}
-
-interface GetNotificationsParams {
-  cursor?: string;
-  limit?: number;
-}
+import {
+  PaginatedResponse,
+  GetNotificationsParams,
+  NotificationType
+} from './types';
 
 export const getNotifications = async (
   params?: GetNotificationsParams

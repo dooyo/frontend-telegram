@@ -225,7 +225,6 @@ export const ProfilePage: React.FC = () => {
                 Share
               </Button>
             </div>
-            <p className="text-muted-foreground">{displayData?.email}</p>
             <p className="text-sm">
               Expires in:{' '}
               {displayData?.expiresAt

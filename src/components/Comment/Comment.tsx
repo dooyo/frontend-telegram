@@ -14,6 +14,7 @@ import {
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu';
 import { Flag, Trash2 } from 'lucide-react';
+import { ContentText } from '../ContentText/ContentText';
 
 type PropsType = {
   comment: CommentType;
@@ -185,9 +186,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <p className="mt-2 text-foreground break-words whitespace-pre-wrap">
-            {comment.text}
-          </p>
+          <ContentText text={comment.text} className="mt-2 text-foreground" />
           <div className="flex items-center justify-between mt-4 px-2">
             <div ref={clockButtonRef}>
               <IconButton

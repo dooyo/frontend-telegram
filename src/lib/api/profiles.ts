@@ -52,13 +52,15 @@ const getProfileStatsById = async (userId: string): Promise<UserStatsType> => {
 };
 
 const getProfilesSearch = async (
-  username: string
-  // limit?: number,
-  // skip?: number
+  username: string,
+  limit?: number,
+  skip?: number
 ): Promise<UserType[]> => {
   try {
     const response = await fetch(
-      `${API_URL}/profiles/search?username=${username}`
+      `${API_URL}/profiles/search?username=${username}${
+        limit ? `&limit=${limit}` : ''
+      }${skip ? `&skip=${skip}` : ''}`
     );
     if (!response.ok) {
       throw new Error('Failed to search profiles');

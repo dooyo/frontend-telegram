@@ -12,17 +12,19 @@ import { Post } from '@/components/Post/Post';
 import { Comment } from '@/components/Comment/Comment';
 import { PostType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import {
+  MentionsInput,
+  MAX_CONTENT_LENGTH
+} from '@/components/ui/mentions-input';
 import { cn } from '@/lib/utils/cn';
 
-const MAX_COMMENT_LENGTH = 280;
 const COMMENTS_PER_PAGE = 20;
 
 export const PostPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [commentText, setCommentText] = useState('');
+  const [mentionedUserIds, setMentionedUserIds] = useState<string[]>([]);
   const [isRefreshing, setRefreshing] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const queryClient = useQueryClient();
@@ -60,14 +62,15 @@ export const PostPage: React.FC = () => {
 
   const { mutateAsync: postComment, isPending } = useMutation({
     mutationFn: (comment: string) =>
-      postCommentOnPost(id as string, { text: comment }),
+      postCommentOnPost(id as string, {
+        text: comment,
+        mentionedUserIds
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post', id] });
       queryClient.invalidateQueries({ queryKey: ['comments', id] });
       setCommentText('');
-      if (textareaRef.current) {
-        textareaRef.current.style.height = '40px';
-      }
+      setMentionedUserIds([]); // Clear mentioned users after successful post
     }
   });
 
@@ -110,37 +113,18 @@ export const PostPage: React.FC = () => {
     };
   }, [handleObserver]);
 
-  const adjustTextareaHeight = useCallback(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      if (!textarea.value) {
-        textarea.style.height = '40px';
-      } else {
-        textarea.style.height = 'auto';
-        textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
-      }
+  const handleCommentChange = useCallback((text: string) => {
+    if (text.length <= MAX_CONTENT_LENGTH) {
+      setCommentText(text);
     }
   }, []);
 
-  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
-    if (text.length <= MAX_COMMENT_LENGTH) {
-      setCommentText(text);
-      adjustTextareaHeight();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-    const pastedText = e.clipboardData.getData('text');
-    const remainingChars = MAX_COMMENT_LENGTH - commentText.length;
-    const trimmedText = pastedText.slice(0, remainingChars);
-    setCommentText((prev) => prev + trimmedText);
-    setTimeout(adjustTextareaHeight, 0);
-  };
+  const handleMentionsChange = useCallback((users: string[]) => {
+    setMentionedUserIds(users);
+  }, []);
 
   const handlePostComment = async () => {
-    if (commentText.trim() && commentText.length <= MAX_COMMENT_LENGTH) {
+    if (commentText.trim() && commentText.length <= MAX_CONTENT_LENGTH) {
       try {
         await postComment(commentText);
       } catch (error) {
@@ -166,7 +150,7 @@ export const PostPage: React.FC = () => {
   }
 
   const allComments = commentsData?.pages.flatMap((page) => page.data) ?? [];
-  const remainingChars = MAX_COMMENT_LENGTH - commentText.length;
+  const remainingChars = MAX_CONTENT_LENGTH - commentText.length;
 
   return (
     <div className="flex flex-col items-center relative min-h-screen bg-background pb-[144px]">
@@ -214,27 +198,21 @@ export const PostPage: React.FC = () => {
           )}
           <div className="flex flex-col gap-2">
             <div className="relative">
-              <Textarea
-                ref={textareaRef}
+              <MentionsInput
                 value={commentText}
                 onChange={handleCommentChange}
-                onPaste={handlePaste}
+                onMentionsChange={handleMentionsChange}
                 placeholder="Write a comment..."
-                rows={1}
+                maxLength={MAX_CONTENT_LENGTH}
                 className={cn(
-                  'pr-16 resize-none overflow-hidden transition-all',
+                  'flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-16',
                   remainingChars <= 20 && 'focus-visible:ring-warning',
                   remainingChars === 0 && 'focus-visible:ring-destructive'
                 )}
-                style={{
-                  height: commentText ? 'auto' : '40px',
-                  minHeight: '40px',
-                  maxHeight: '120px'
-                }}
               />
               <span
                 className={cn(
-                  'absolute right-3 top-3 text-xs',
+                  'absolute right-6 top-3 text-xs px-2 bg-background',
                   remainingChars <= 20
                     ? 'text-warning'
                     : 'text-muted-foreground',
@@ -249,7 +227,7 @@ export const PostPage: React.FC = () => {
               disabled={
                 isPending ||
                 !commentText.trim() ||
-                commentText.length > MAX_COMMENT_LENGTH
+                commentText.length > MAX_CONTENT_LENGTH
               }
               className="w-full"
             >
