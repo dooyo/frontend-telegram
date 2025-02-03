@@ -8,6 +8,7 @@ import { PostType, UserType } from '@/lib/types';
 import { Avatar } from 'files-ui-react-19';
 import { ShareModal } from '@/components/ShareModal/ShareModal';
 import { ClockFountain } from '@/components/ClockFountain/ClockFountain';
+import { useLimits } from '@/context/LimitsContext';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -31,6 +32,7 @@ export const Post = ({ post }: PropsType) => {
   const clockButtonRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { refreshLimits } = useLimits();
 
   const { mutateAsync: likePostMutate, isPending: isLikePending } = useMutation(
     {
@@ -55,6 +57,7 @@ export const Post = ({ post }: PropsType) => {
     mutationFn: deletePost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      refreshLimits();
       navigate('/');
     }
   });

@@ -5,6 +5,7 @@ export interface UserType {
   username: string;
   avatarUrl?: string;
   expiresAt?: string;
+  isPremium: boolean;
 }
 
 export interface UserStatsType {

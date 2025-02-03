@@ -1,6 +1,7 @@
 import { API_URL } from './config';
 import { UserStatsType, UserType } from '@/lib/types';
 import { getAuthToken } from './auth';
+import { UserLimits } from './types';
 
 const getMe = async (): Promise<UserType> => {
   const authToken = await getAuthToken();
@@ -69,6 +70,31 @@ const getProfilesSearch = async (
     return data;
   } catch (error) {
     throw new Error(`Failed fetching profile: ${error}`);
+  }
+};
+
+export const getUserLimits = async (): Promise<UserLimits> => {
+  const authToken = await getAuthToken();
+  if (!authToken) {
+    throw new Error('No auth token found');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/profiles/me/limits`, {
+      headers: {
+        Authorization: authToken,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch user limits');
+    }
+
+    const data = await response.json();
+    return data as UserLimits;
+  } catch (error) {
+    throw new Error(`Failed fetching user limits: ${error}`);
   }
 };
 

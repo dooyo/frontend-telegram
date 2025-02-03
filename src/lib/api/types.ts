@@ -59,3 +59,16 @@ export interface NotificationType {
     amount?: number;
   };
 }
+
+export interface LimitInfo {
+  current: number;
+  max: number;
+  remaining: number;
+}
+
+export interface UserLimits {
+  posts: LimitInfo;
+  comments: LimitInfo;
+  isPremium: boolean;
+  premiumExpiresAt: string | null;
+}

@@ -7,6 +7,7 @@ import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '@/components/IconButton/IconButton';
 import { Avatar } from 'files-ui-react-19';
 import { ClockFountain } from '@/components/ClockFountain/ClockFountain';
+import { useLimits } from '@/context/LimitsContext';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -27,6 +28,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
   const clockButtonRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { refreshLimits } = useLimits();
 
   const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
   const hasReacted = comment.reactions.includes(me._id);
@@ -55,6 +57,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments', comment.post] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.post] });
+      refreshLimits();
     }
   });
 

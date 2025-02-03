@@ -9,6 +9,7 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/ErrorBoundary.tsx';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { LimitsProvider } from '@/context/LimitsContext';
 import { routes } from '@/navigation/routes.tsx';
 import { AppLayout } from '@/components/AppLayout/AppLayout';
 import { useLaunchParams } from '@telegram-apps/sdk-react';
@@ -69,26 +70,28 @@ const Inner: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <DeepLinkHandler>
-          <Routes>
-            {routes.map(({ path, Component, layout }) => (
-              <Route
-                key={path}
-                path={path}
-                element={
-                  layout ? (
-                    <AppLayout>
+        <LimitsProvider>
+          <DeepLinkHandler>
+            <Routes>
+              {routes.map(({ path, Component, layout }) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={
+                    layout ? (
+                      <AppLayout>
+                        <Component />
+                      </AppLayout>
+                    ) : (
                       <Component />
-                    </AppLayout>
-                  ) : (
-                    <Component />
-                  )
-                }
-              />
-            ))}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </DeepLinkHandler>
+                    )
+                  }
+                />
+              ))}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </DeepLinkHandler>
+        </LimitsProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

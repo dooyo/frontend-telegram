@@ -38,6 +38,7 @@ interface MentionsInputProps {
   className?: string;
   maxLength?: number;
   rows?: number;
+  disabled?: boolean;
 }
 
 export const MentionsInput: React.FC<MentionsInputProps> = ({
@@ -47,7 +48,8 @@ export const MentionsInput: React.FC<MentionsInputProps> = ({
   placeholder = 'Type your message here. Use @ to mention someone.',
   className,
   maxLength,
-  rows
+  rows,
+  disabled = false
 }) => {
   const [isMentioning, setIsMentioning] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -340,6 +342,7 @@ export const MentionsInput: React.FC<MentionsInputProps> = ({
           height: value ? 'auto' : '40px',
           minHeight: '40px'
         }}
+        disabled={disabled}
       />
       <div ref={anchorRef} aria-hidden="true" />
       <Popover

@@ -27,6 +27,10 @@ import {
 } from '@/components/ui/accordion';
 import { Post } from '@/components/Post/Post';
 import { Comment } from '@/components/Comment/Comment';
+import { LimitsDisplay } from '@/components/LimitsDisplay/LimitsDisplay';
+import { Badge } from '@/components/ui/badge';
+import { Crown } from 'lucide-react';
+import { useLimits } from '@/context/LimitsContext';
 
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -42,6 +46,8 @@ export const ProfilePage: React.FC = () => {
     queryKey: ['me'],
     queryFn: getMe
   });
+
+  const { limits } = useLimits();
 
   const {
     data: userData,
@@ -213,9 +219,16 @@ export const ProfilePage: React.FC = () => {
         <div className="w-full space-y-6 max-w-2xl">
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-4">
-              <h1 className="text-2xl font-semibold truncate">
-                {displayData?.username}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-semibold truncate">
+                  {displayData?.username}
+                </h1>
+                {userData?.isPremium && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Crown className="h-3 w-3" />
+                  </Badge>
+                )}
+              </div>
               <Button
                 onClick={() => setShowShareModal(true)}
                 className="flex items-center gap-2 shrink-0"
@@ -231,6 +244,18 @@ export const ProfilePage: React.FC = () => {
                 ? timeUntil(displayData?.expiresAt)
                 : 'NEVER'}
             </p>
+            {isCurrentUser && (
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <LimitsDisplay type="posts" showUpgradeButton={false} />
+                <LimitsDisplay
+                  type="comments"
+                  showUpgradeButton={
+                    limits?.comments.remaining === 0 ||
+                    limits?.posts.remaining === 0
+                  }
+                />
+              </div>
+            )}
           </div>
 
           {!isLoadingStats && userStats && (
