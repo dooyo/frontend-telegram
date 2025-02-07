@@ -1,13 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { likeComment, dislikeComment, deleteComment } from '@/lib/api/posts';
 import { CommentType, UserType } from '@/lib/types';
-import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '@/components/IconButton/IconButton';
 import { Avatar } from 'files-ui-react-19';
-import { ClockFountain } from '@/components/ClockFountain/ClockFountain';
 import { useLimits } from '@/context/LimitsContext';
+import { motion } from 'framer-motion';
+import { useTimeAnimation } from '@/hooks/useTimeAnimation';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,13 +22,17 @@ type PropsType = {
 };
 
 export const Comment: React.FC<PropsType> = ({ comment }) => {
-  const [showLikeAnimation, setShowLikeAnimation] = useState(false);
-  const [showDislikeAnimation, setShowDislikeAnimation] = useState(false);
-  const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
   const clockButtonRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { refreshLimits } = useLimits();
+
+  const {
+    currentTime,
+    timeChangeColor,
+    handleTimeIncrease,
+    handleTimeDecrease
+  } = useTimeAnimation({ expiresAt: comment.expiresAt });
 
   const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
   const hasReacted = comment.reactions.includes(me._id);
@@ -64,19 +68,9 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
   const handleLikeComment = async () => {
     try {
       if (!hasReacted) {
-        const rect = clockButtonRef.current?.getBoundingClientRect();
-        if (rect) {
-          setAnimationPosition({
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-          });
-        }
-        setShowLikeAnimation(true);
+        handleTimeIncrease();
       }
       await likeCommentMutate(comment._id as any);
-      if (!hasReacted) {
-        setTimeout(() => setShowLikeAnimation(false), 1000);
-      }
     } catch (error) {
       console.error(`Failed to like comment ${comment._id}:`, error);
     }
@@ -85,19 +79,9 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
   const handleDislikeComment = async () => {
     try {
       if (!hasReacted) {
-        const rect = clockButtonRef.current?.getBoundingClientRect();
-        if (rect) {
-          setAnimationPosition({
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-          });
-        }
-        setShowDislikeAnimation(true);
+        handleTimeDecrease();
       }
       await dislikeCommentMutate(comment._id as any);
-      if (!hasReacted) {
-        setTimeout(() => setShowDislikeAnimation(false), 1000);
-      }
     } catch (error) {
       console.error(`Failed to dislike comment ${comment._id}:`, error);
     }
@@ -194,7 +178,17 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
             <div ref={clockButtonRef}>
               <IconButton
                 icon="clock-outline"
-                number={timeUntil(comment.expiresAt)}
+                color={timeChangeColor}
+                number={
+                  <motion.div
+                    style={{ color: timeChangeColor }}
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {currentTime}
+                  </motion.div>
+                }
               />
             </div>
             <IconButton
@@ -215,20 +209,6 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
           </div>
         </div>
       </div>
-      {showLikeAnimation && !hasReacted && (
-        <ClockFountain
-          isLiked={true}
-          x={animationPosition.x}
-          y={animationPosition.y}
-        />
-      )}
-      {showDislikeAnimation && !hasReacted && (
-        <ClockFountain
-          isLiked={false}
-          x={animationPosition.x}
-          y={animationPosition.y}
-        />
-      )}
     </>
   );
 };

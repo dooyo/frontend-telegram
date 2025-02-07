@@ -2,13 +2,12 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { likePost, dislikePost, deletePost } from '@/lib/api/posts';
-import { timeUntil } from '@/lib/helpers/timeCompute';
 import { IconButton } from '@/components/IconButton/IconButton';
 import { PostType, UserType } from '@/lib/types';
 import { Avatar } from 'files-ui-react-19';
 import { ShareModal } from '@/components/ShareModal/ShareModal';
-import { ClockFountain } from '@/components/ClockFountain/ClockFountain';
 import { useLimits } from '@/context/LimitsContext';
+import { motion } from 'framer-motion';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Flag, Trash2 } from 'lucide-react';
 import { ContentText } from '../ContentText/ContentText';
+import { useTimeAnimation } from '@/hooks/useTimeAnimation';
 
 type PropsType = {
   post: PostType;
@@ -24,15 +24,23 @@ type PropsType = {
 
 export const Post = ({ post }: PropsType) => {
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showLikeAnimation, setShowLikeAnimation] = useState(false);
-  const [showDislikeAnimation, setShowDislikeAnimation] = useState(false);
-  const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
   const likeButtonRef = useRef<HTMLDivElement>(null);
   const dislikeButtonRef = useRef<HTMLDivElement>(null);
   const clockButtonRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { refreshLimits } = useLimits();
+
+  const {
+    currentTime,
+    timeChangeColor,
+    handleTimeIncrease,
+    handleTimeDecrease
+  } = useTimeAnimation({ expiresAt: post.expiresAt });
+
+  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
+  const hasReacted = post.reactions.includes(me._id);
+  const isMyPost = post.user._id === me._id;
 
   const { mutateAsync: likePostMutate, isPending: isLikePending } = useMutation(
     {
@@ -62,26 +70,12 @@ export const Post = ({ post }: PropsType) => {
     }
   });
 
-  const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
-  const hasReacted = post.reactions.includes(me._id);
-  const isMyPost = post.user._id === me._id;
-
   const handleLikePost = async () => {
     try {
       if (!hasReacted) {
-        const rect = clockButtonRef.current?.getBoundingClientRect();
-        if (rect) {
-          setAnimationPosition({
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-          });
-        }
-        setShowLikeAnimation(true);
+        handleTimeIncrease();
       }
       await likePostMutate(post._id as any);
-      if (!hasReacted) {
-        setTimeout(() => setShowLikeAnimation(false), 1000);
-      }
     } catch (error) {
       console.error(`Failed to like post ${post._id}:`, error);
     }
@@ -90,19 +84,9 @@ export const Post = ({ post }: PropsType) => {
   const handleDislikePost = async () => {
     try {
       if (!hasReacted) {
-        const rect = clockButtonRef.current?.getBoundingClientRect();
-        if (rect) {
-          setAnimationPosition({
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-          });
-        }
-        setShowDislikeAnimation(true);
+        handleTimeDecrease();
       }
       await dislikePostMutate(post._id as any);
-      if (!hasReacted) {
-        setTimeout(() => setShowDislikeAnimation(false), 1000);
-      }
     } catch (error) {
       console.error(`Failed to dislike post ${post._id}:`, error);
     }
@@ -214,7 +198,20 @@ export const Post = ({ post }: PropsType) => {
           onClick={() => navigate(`/post/${post._id}`)}
         />
         <div ref={clockButtonRef}>
-          <IconButton icon="clock-outline" number={timeUntil(post.expiresAt)} />
+          <IconButton
+            icon="clock-outline"
+            color={timeChangeColor}
+            number={
+              <motion.div
+                style={{ color: timeChangeColor }}
+                initial={{ scale: 1 }}
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 0.3 }}
+              >
+                {currentTime}
+              </motion.div>
+            }
+          />
         </div>
         <div ref={likeButtonRef}>
           <IconButton
@@ -243,20 +240,6 @@ export const Post = ({ post }: PropsType) => {
         <ShareModal
           postId={post._id}
           onClose={() => setShowShareModal(false)}
-        />
-      )}
-      {showLikeAnimation && !hasReacted && (
-        <ClockFountain
-          isLiked={true}
-          x={animationPosition.x}
-          y={animationPosition.y}
-        />
-      )}
-      {showDislikeAnimation && !hasReacted && (
-        <ClockFountain
-          isLiked={false}
-          x={animationPosition.x}
-          y={animationPosition.y}
         />
       )}
     </>

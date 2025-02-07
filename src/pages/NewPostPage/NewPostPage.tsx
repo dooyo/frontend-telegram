@@ -24,6 +24,7 @@ export const NewPostPage: React.FC = () => {
     mutationFn: createPost,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      refreshLimits();
     }
   });
 
@@ -32,7 +33,7 @@ export const NewPostPage: React.FC = () => {
     queryFn: getMe
   });
 
-  const { limits } = useLimits();
+  const { limits, refreshLimits } = useLimits();
   const isAtLimit = limits?.posts.remaining === 0;
 
   const handleTextChange = useCallback((newText: string) => {

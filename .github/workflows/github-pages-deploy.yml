@@ -46,6 +46,8 @@ jobs:
 
       - name: Build
         run: pnpm run build
+        env:
+          VITE_TELEGRAM_ANALYTICS_TOKEN: ${{ secrets.TELEGRAM_ANALYTICS_TOKEN }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

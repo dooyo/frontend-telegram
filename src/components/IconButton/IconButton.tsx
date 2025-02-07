@@ -1,4 +1,5 @@
 import { IconContext } from 'react-icons';
+import React from 'react';
 import {
   MdComment,
   MdAccessTime,
@@ -19,7 +20,7 @@ const icons: { [key: string]: any } = {
 
 interface IconButtonProps {
   icon: keyof typeof icons;
-  number?: number | string;
+  number?: number | string | React.ReactNode;
   onClick?: () => void;
   color?: string;
   isPressed?: boolean;
@@ -48,7 +49,7 @@ export const IconButton = ({
         {IconComponent && <IconComponent />}
       </IconContext.Provider>
       {number !== undefined && (
-        <span className="text-xs text-muted-foreground">{number}</span>
+        <div className="text-xs text-muted-foreground">{number}</div>
       )}
     </Button>
   );
