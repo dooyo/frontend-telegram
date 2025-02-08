@@ -3,9 +3,10 @@ import { NavLink } from '@/components/ui/nav-link';
 import { NotificationBell } from '@/components/Notifications/NotificationBell';
 import { NotificationsModal } from '@/components/Notifications/NotificationsModal';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useAuth } from '@/context/AuthContext';
 
 export const NavBar = () => {
-  const me = JSON.parse(localStorage.getItem('me') || '{}');
+  const { user } = useAuth();
   const { isOpen, unreadCount, openNotifications, onOpenChange } =
     useNotifications();
 
@@ -19,9 +20,9 @@ export const NavBar = () => {
         <div className="flex justify-around items-center h-16">
           <NavLink to="/feed" icon={<Home />} label="Feed" />
           <NavLink to="/friends" icon={<Users />} label="Friends" />
-          {me._id && (
+          {user?._id && (
             <NavLink
-              to={`/profile/${me._id}`}
+              to={`/profile/${user._id}`}
               icon={<User />}
               label="Profile"
             />

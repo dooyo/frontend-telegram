@@ -147,7 +147,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
                 @{comment.user.username}
               </button>
             </div>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <button
                   className="text-muted-foreground hover:text-foreground transition-colors px-2"

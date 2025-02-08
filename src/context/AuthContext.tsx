@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { UserType } from '@/lib/types';
-import { authTgUser } from '@/lib/api/auth';
+import { authTgUser, getMe } from '@/lib/api/auth';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 
 interface AuthContextProps {
@@ -37,8 +37,16 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
         if (existingToken && existingUser) {
           const decodedToken = jwtDecode<{ exp: number }>(existingToken);
           if (decodedToken.exp && Date.now() < decodedToken.exp * 1000) {
+            // Even if we have stored user data, fetch fresh data to ensure it's up to date
             setAuthToken(existingToken);
-            setUser(JSON.parse(existingUser));
+            try {
+              const freshUserData = await getMe(existingToken);
+              setUser(freshUserData);
+              localStorage.setItem('me', JSON.stringify(freshUserData));
+            } catch (error) {
+              console.error('Failed to fetch fresh user data:', error);
+              setUser(JSON.parse(existingUser));
+            }
           } else {
             // Token expired, try to re-authenticate
             if (!initDataRaw) {
@@ -78,7 +86,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     setAuthToken(newToken);
   };
 
-  const updateMe = (me: UserType) => {
+  const updateMe = async (me: UserType) => {
     localStorage.setItem('me', JSON.stringify(me));
     setUser(me);
   };
@@ -98,7 +106,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     <AuthContext.Provider
       value={{
         authToken,
-        isAuthenticated: !!authToken,
+        isAuthenticated: !!authToken && !!user,
         isLoading,
         user,
         updateAuthToken,
