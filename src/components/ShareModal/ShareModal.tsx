@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Copy, Check } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface ShareModalProps {
   postId?: string;
@@ -14,13 +15,14 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   onClose
 }) => {
   const [copied, setCopied] = useState(false);
+  const { user: me } = useAuth();
 
   const handleCopyLink = async () => {
     let link;
     if (postId) {
-      link = `https://t.me/dooyoappbot/app?startapp=post_${postId}`;
+      link = `https://t.me/dooyoappbot/app?startapp=post_${postId}&fromUser=${me?._id}`;
     } else if (userId) {
-      link = `https://t.me/dooyoappbot/app?startapp=profile_${userId}`;
+      link = `https://t.me/dooyoappbot/app?startapp=profile_${userId}&fromUser=${me?._id}`;
     } else {
       console.error('Either postId or userId must be provided');
       return;
