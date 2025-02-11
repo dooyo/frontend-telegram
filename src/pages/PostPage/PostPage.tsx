@@ -12,6 +12,7 @@ import { Comment } from '@/components/Comment/Comment';
 import { PostType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { CommentInput } from '@/components/CommentInput/CommentInput';
+import { Helmet } from 'react-helmet';
 
 const COMMENTS_PER_PAGE = 20;
 
@@ -111,6 +112,11 @@ export const PostPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center relative min-h-screen bg-background pb-[144px]">
+      <Helmet>
+        <meta property="og:title" content="DooYo Post" />
+        <meta property="og:description" content={post?.text || ''} />
+        <meta property="og:image" content={post?.user?.avatarUrl || ''} />
+      </Helmet>
       <div className="w-full max-w-3xl px-4">
         <Post post={post as PostType} />
 
