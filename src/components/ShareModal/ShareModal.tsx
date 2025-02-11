@@ -20,9 +20,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   const handleCopyLink = async () => {
     let link;
     if (postId) {
-      link = `https://t.me/dooyoappbot/app?startapp=post_${postId}&fromUser=${me?._id}`;
+      link = `https://t.me/dooyoappbot/app?startapp=post_${postId}_ref_${me?._id}`;
     } else if (userId) {
-      link = `https://t.me/dooyoappbot/app?startapp=profile_${userId}&fromUser=${me?._id}`;
+      link = `https://t.me/dooyoappbot/app?startapp=profile_${userId}_ref_${me?._id}`;
     } else {
       console.error('Either postId or userId must be provided');
       return;
