@@ -2,20 +2,32 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils/cn';
 import { getProfilesSearch } from '@/lib/api/profiles';
+import { MediaPreview } from '@/components/MediaPreview/MediaPreview';
+import { useUrlDetection } from '@/hooks/useUrlDetection';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 interface ContentTextProps {
   text: string;
   className?: string;
+  showPreviews?: boolean;
+  isExpanded?: boolean;
+  onPostClick?: () => void;
 }
 
 export const ContentText: React.FC<ContentTextProps> = ({
   text,
-  className
+  className,
+  showPreviews = true,
+  isExpanded = false,
+  onPostClick
 }) => {
   const navigate = useNavigate();
+  const { urls, error, retryFetch } = useUrlDetection(text);
 
   const handleMentionClick = async (username: string, e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     try {
       // Remove @ from username
       const cleanUsername = username.substring(1);
@@ -28,38 +40,104 @@ export const ContentText: React.FC<ContentTextProps> = ({
         navigate(`/profile/${exactMatch._id}`);
       } else {
         console.warn(`User ${username} not found`);
-        // Optionally show a toast/notification that user wasn't found
       }
     } catch (error) {
       console.error('Error resolving username:', error);
     }
   };
 
-  // Split text into parts, preserving mentions
-  const parts = text.split(/(@[\w]+)/g).map((part, index) => {
-    if (part.startsWith('@')) {
-      return (
-        <a
-          key={index}
-          href={`#${part}`} // Placeholder href
-          onClick={(e) => handleMentionClick(part, e)}
-          className={cn(
-            'text-primary hover:underline cursor-pointer',
-            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-            'rounded-sm'
-          )}
-          tabIndex={0}
-          role="link"
-          aria-label={`View ${part}'s profile`}
-        >
-          {part}
-        </a>
-      );
+  const handleUrlClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = e.currentTarget.href;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleContentClick = () => {
+    if (onPostClick) {
+      onPostClick();
     }
-    return <span key={index}>{part}</span>;
-  });
+  };
+
+  // Split text into parts, preserving mentions and URLs
+  const parts = text
+    .split(/(@[\w]+|https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g)
+    .map((part, index) => {
+      if (part.startsWith('@')) {
+        return (
+          <a
+            key={index}
+            href={`#${part}`}
+            onClick={(e) => handleMentionClick(part, e)}
+            className={cn(
+              'text-primary hover:underline cursor-pointer',
+              'focus:outline-none focus:ring-2 focus:ring-primary focus-offset-2',
+              'rounded-sm'
+            )}
+            tabIndex={0}
+            role="link"
+            aria-label={`View ${part}'s profile`}
+          >
+            {part}
+          </a>
+        );
+      } else if (part.match(/^https?:\/\//)) {
+        return (
+          <a
+            key={index}
+            href={part}
+            onClick={handleUrlClick}
+            className="text-blue-500 hover:underline cursor-pointer"
+            tabIndex={0}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Open ${part} in new tab`}
+          >
+            {part}
+          </a>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
 
   return (
-    <p className={cn('whitespace-pre-wrap break-words', className)}>{parts}</p>
+    <div className={className} onClick={handleContentClick}>
+      <p className="whitespace-pre-wrap break-words">{parts}</p>
+      {showPreviews && (urls.length > 0 || error) && (
+        <div className="mt-2 space-y-2">
+          {error && (
+            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground bg-muted/50 rounded-md">
+              <span>{error}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  retryFetch();
+                }}
+                className="h-7 px-2"
+              >
+                <RefreshCw className="h-4 w-4 mr-1" />
+                Retry
+              </Button>
+            </div>
+          )}
+          {urls
+            .filter(
+              (metadata) =>
+                metadata.type !== 'URL' ||
+                metadata.description ||
+                (metadata.image && metadata.title)
+            )
+            .map((metadata, index) => (
+              <MediaPreview
+                key={`${metadata.url}-${index}`}
+                metadata={metadata}
+                isExpanded={isExpanded}
+              />
+            ))}
+        </div>
+      )}
+    </div>
   );
 };

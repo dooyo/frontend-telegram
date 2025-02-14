@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils/cn';
 import { MentionsInput } from '@/components/ui/mentions-input';
 import { LimitsDisplay } from '@/components/LimitsDisplay/LimitsDisplay';
 import { useLimits } from '@/context/LimitsContext';
+import { MediaPreview } from '@/components/MediaPreview/MediaPreview';
+import { useUrlDetection } from '@/hooks/useUrlDetection';
 
 const MAX_CHARS = 280;
 
@@ -19,6 +21,7 @@ export const NewPostPage: React.FC = () => {
   const [mentionedUserIds, setMentionedUserIds] = useState<string[]>([]);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { urls } = useUrlDetection(text);
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: createPost,
@@ -44,6 +47,16 @@ export const NewPostPage: React.FC = () => {
 
   const handleMentionsChange = useCallback((users: string[]) => {
     setMentionedUserIds(users);
+  }, []);
+
+  const handleRemoveUrl = useCallback((urlToRemove: string) => {
+    setText((currentText) => {
+      // Create a regex that matches the URL with optional surrounding whitespace
+      const urlRegex = new RegExp(
+        `\\s*${urlToRemove.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*`
+      );
+      return currentText.replace(urlRegex, ' ').trim();
+    });
   }, []);
 
   const handlePost = async () => {
@@ -90,7 +103,7 @@ export const NewPostPage: React.FC = () => {
             variant="circle"
             readOnly
           />
-          <div className="flex-1">
+          <div className="flex-1 space-y-4">
             <MentionsInput
               value={text}
               onChange={handleTextChange}
@@ -103,6 +116,24 @@ export const NewPostPage: React.FC = () => {
               )}
               disabled={isAtLimit}
             />
+            {urls.length > 0 && (
+              <div className="space-y-2">
+                {urls
+                  .filter(
+                    (metadata) =>
+                      metadata.type !== 'URL' ||
+                      metadata.description ||
+                      (metadata.image && metadata.title)
+                  )
+                  .map((metadata, index) => (
+                    <MediaPreview
+                      key={`${metadata.url}-${index}`}
+                      metadata={metadata}
+                      onRemove={() => handleRemoveUrl(metadata.url)}
+                    />
+                  ))}
+              </div>
+            )}
           </div>
         </div>
 

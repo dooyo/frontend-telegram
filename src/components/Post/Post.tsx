@@ -185,7 +185,11 @@ export const Post = ({ post }: PropsType) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <ContentText text={post.text} className="mt-2 text-foreground" />
+          <ContentText
+            text={post.text}
+            className="mt-2 text-foreground"
+            onPostClick={handlePostClick}
+          />
         </div>
       </div>
       <div
