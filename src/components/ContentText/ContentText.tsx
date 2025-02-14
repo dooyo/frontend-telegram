@@ -6,6 +6,7 @@ import { MediaPreview } from '@/components/MediaPreview/MediaPreview';
 import { useUrlDetection } from '@/hooks/useUrlDetection';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
+import { getMediaType } from '@/lib/utils/urlUtils';
 
 interface ContentTextProps {
   text: string;
@@ -82,6 +83,12 @@ export const ContentText: React.FC<ContentTextProps> = ({
           </a>
         );
       } else if (part.match(/^https?:\/\//)) {
+        // Check if it's a media URL
+        const mediaType = getMediaType(part);
+        if (mediaType !== 'URL') {
+          // Don't render media URLs in text
+          return null;
+        }
         return (
           <a
             key={index}
@@ -98,7 +105,8 @@ export const ContentText: React.FC<ContentTextProps> = ({
         );
       }
       return <span key={index}>{part}</span>;
-    });
+    })
+    .filter(Boolean); // Remove null values (hidden media URLs)
 
   return (
     <div className={className} onClick={handleContentClick}>
