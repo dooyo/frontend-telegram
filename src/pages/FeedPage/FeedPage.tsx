@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useRef, useCallback } from 'react';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { getPosts } from '@/lib/api/posts';
 import { getMyFollowings } from '@/lib/api/followers';
 import { Post } from '@/components/Post/Post';
@@ -11,6 +11,7 @@ import { Container } from '@/components/ui/container';
 import { cn } from '@/lib/utils/cn';
 
 const POSTS_PER_PAGE = 20;
+const FOLLOWINGS_PER_PAGE = 50; // We can load more followings at once since we need the full list for filtering
 
 type FilterType = 'none' | 'frens' | 'fading';
 
@@ -19,18 +20,38 @@ export const FeedPage: FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>('none');
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // Query to get following users
-  const { data: followingData } = useQuery({
+  // Query to get following users with pagination
+  const {
+    data: followingData,
+    hasNextPage: hasMoreFollowings,
+    fetchNextPage: fetchNextFollowings,
+    isFetchingNextPage: isFetchingNextFollowings
+  } = useInfiniteQuery({
     queryKey: ['following'],
-    queryFn: getMyFollowings,
+    queryFn: ({ pageParam }) =>
+      getMyFollowings({
+        cursor: pageParam,
+        limit: FOLLOWINGS_PER_PAGE
+      }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.nextCursor : undefined,
     staleTime: 1000 * 60 * 5 // 5 minutes
   });
 
+  // Load all following pages if there are more
+  useEffect(() => {
+    if (hasMoreFollowings && !isFetchingNextFollowings) {
+      fetchNextFollowings();
+    }
+  }, [hasMoreFollowings, isFetchingNextFollowings, fetchNextFollowings]);
+
   // Safely get following IDs, filtering out any deleted users
   const followingIds =
-    followingData
-      ?.filter((following) => following.user && following.user._id)
-      ?.map((following) => following.user._id) || [];
+    followingData?.pages
+      .flatMap((page) => page.data)
+      .filter((following) => following.user && following.user._id)
+      .map((following) => following.user._id) || [];
 
   const {
     data,

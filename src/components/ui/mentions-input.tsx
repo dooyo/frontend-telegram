@@ -84,8 +84,8 @@ export const MentionsInput: React.FC<MentionsInputProps> = ({
   const loadFollowings = useCallback(async () => {
     try {
       setIsLoading(true);
-      const followings = await getMyFollowings();
-      setSuggestions(followings);
+      const followingsResponse = await getMyFollowings({ limit: 50 }); // Load more followings at once for mentions
+      setSuggestions(followingsResponse.data);
     } catch (error) {
       console.error('Failed to load followings:', error);
       setSuggestions([]);

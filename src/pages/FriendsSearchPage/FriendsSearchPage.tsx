@@ -13,12 +13,8 @@ export const FriendsSearchPage: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (searchTerm.length > 2) {
-        const response = await getProfilesSearch(searchTerm);
-        setSearchResults(response as UserType[]);
-      } else {
-        setSearchResults([]);
-      }
+      const response = await getProfilesSearch(searchTerm || '');
+      setSearchResults(response as UserType[]);
     };
 
     fetchData();

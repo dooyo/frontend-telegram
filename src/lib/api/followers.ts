@@ -1,6 +1,7 @@
 import { API_URL } from './config';
 import { Following } from '../types';
 import { getAuthToken } from './auth';
+import { PaginatedResponse } from './types';
 
 const isMeFollowingUser = async (userId: string): Promise<boolean> => {
   const authToken = await getAuthToken();
@@ -40,37 +41,58 @@ const isUserFollowingMe = async (userId: string): Promise<boolean> => {
   return response.json();
 };
 
-const getMyFollowers = async (): Promise<Following[]> => {
+interface GetFollowersParams {
+  cursor?: string;
+  limit?: number;
+}
+
+const getMyFollowers = async (
+  params?: GetFollowersParams
+): Promise<PaginatedResponse<Following>> => {
   const authToken = await getAuthToken();
   if (!authToken) {
-    return [] as Following[];
+    return { data: [], total: 0, hasMore: false };
   }
 
-  const response = await fetch(`${API_URL}/followers`, {
-    method: 'GET',
-    headers: {
-      Authorization: authToken,
-      'Content-Type': 'application/json'
+  const searchParams = new URLSearchParams();
+  if (params?.cursor) searchParams.append('cursor', params.cursor);
+  if (params?.limit) searchParams.append('limit', params.limit.toString());
+
+  const response = await fetch(
+    `${API_URL}/followers${
+      searchParams.toString() ? `?${searchParams.toString()}` : ''
+    }`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: authToken,
+        'Content-Type': 'application/json'
+      }
     }
-  });
+  );
   if (response.status !== 200) {
-    throw new Error('Failed to fetch posts');
+    throw new Error('Failed to fetch followers');
   }
   return response.json();
 };
 
 const getFollowers = async (
   userId: string,
-  page: number = 1,
-  limit: number = 10
-): Promise<Following[]> => {
+  params?: GetFollowersParams
+): Promise<PaginatedResponse<Following>> => {
   const authToken = await getAuthToken();
   if (!authToken) {
-    return [];
+    return { data: [], total: 0, hasMore: false };
   }
 
+  const searchParams = new URLSearchParams();
+  if (params?.cursor) searchParams.append('cursor', params.cursor);
+  if (params?.limit) searchParams.append('limit', params.limit.toString());
+
   const response = await fetch(
-    `${API_URL}/followers/${userId}?page=${page}&limit=${limit}`,
+    `${API_URL}/followers/${userId}${
+      searchParams.toString() ? `?${searchParams.toString()}` : ''
+    }`,
     {
       method: 'GET',
       headers: {
@@ -80,42 +102,58 @@ const getFollowers = async (
     }
   );
   if (response.status !== 200) {
-    throw new Error('Failed to fetch posts');
+    throw new Error('Failed to fetch followers');
   }
   return response.json();
 };
 
-const getMyFollowings = async (): Promise<Following[]> => {
+const getMyFollowings = async (
+  params?: GetFollowersParams
+): Promise<PaginatedResponse<Following>> => {
   const authToken = await getAuthToken();
   if (!authToken) {
-    return [];
+    return { data: [], total: 0, hasMore: false };
   }
 
-  const response = await fetch(`${API_URL}/following`, {
-    method: 'GET',
-    headers: {
-      Authorization: authToken,
-      'Content-Type': 'application/json'
+  const searchParams = new URLSearchParams();
+  if (params?.cursor) searchParams.append('cursor', params.cursor);
+  if (params?.limit) searchParams.append('limit', params.limit.toString());
+
+  const response = await fetch(
+    `${API_URL}/following${
+      searchParams.toString() ? `?${searchParams.toString()}` : ''
+    }`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: authToken,
+        'Content-Type': 'application/json'
+      }
     }
-  });
+  );
   if (response.status !== 200) {
-    throw new Error('Failed to fetch posts');
+    throw new Error('Failed to fetch followings');
   }
   return response.json();
 };
 
 const getFollowings = async (
   userId: string,
-  page: number = 1,
-  limit: number = 10
-): Promise<Following[]> => {
+  params?: GetFollowersParams
+): Promise<PaginatedResponse<Following>> => {
   const authToken = await getAuthToken();
   if (!authToken) {
-    return [];
+    return { data: [], total: 0, hasMore: false };
   }
 
+  const searchParams = new URLSearchParams();
+  if (params?.cursor) searchParams.append('cursor', params.cursor);
+  if (params?.limit) searchParams.append('limit', params.limit.toString());
+
   const response = await fetch(
-    `${API_URL}/following/${userId}?page=${page}&limit=${limit}`,
+    `${API_URL}/following/${userId}${
+      searchParams.toString() ? `?${searchParams.toString()}` : ''
+    }`,
     {
       method: 'GET',
       headers: {
@@ -125,7 +163,7 @@ const getFollowings = async (
     }
   );
   if (response.status !== 200) {
-    throw new Error('Failed to fetch posts');
+    throw new Error('Failed to fetch followings');
   }
   return response.json();
 };
