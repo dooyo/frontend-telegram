@@ -28,7 +28,11 @@ export const PostPage: React.FC = () => {
     error: postError
   } = useQuery({
     queryKey: ['post', id],
-    queryFn: () => getPost(id as string)
+    queryFn: () => getPost(id as string),
+    retry: (failureCount, error) => {
+      // Only retry if it's not a "Post not found" error
+      return (error as Error).message !== 'Post not found' && failureCount < 3;
+    }
   });
 
   const {
@@ -50,7 +54,7 @@ export const PostPage: React.FC = () => {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
-    enabled: !!id
+    enabled: !!id && !postError // Don't fetch comments if post not found
   });
 
   const onRefresh = async () => {
@@ -101,9 +105,24 @@ export const PostPage: React.FC = () => {
   }
 
   if (postError) {
+    const isNotFound = (postError as Error).message === 'Post not found';
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-xl text-destructive">Post not found</div>
+      <div className="flex flex-col items-center justify-center h-screen gap-6">
+        <div className="text-xl text-destructive font-medium">
+          {!isNotFound && 'Failed to load post'}
+        </div>
+        {isNotFound && (
+          <>
+            <div className="text-muted-foreground text-sm">
+              There's been something here... now it's in the void...
+            </div>
+            <img
+              src="https://media.tenor.com/0IHINvvs6ccAAAAM/disintegrating-funny.gif"
+              alt="Disintegrating GIF"
+              className="rounded-lg shadow-lg w-64 h-64 object-cover"
+            />
+          </>
+        )}
       </div>
     );
   }

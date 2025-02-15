@@ -61,9 +61,15 @@ const getPost = async (id: string) => {
       'Content-Type': 'application/json'
     }
   });
+
+  if (response.status === 404) {
+    throw new Error('Post not found');
+  }
+
   if (response.status !== 200) {
     throw new Error('Failed to fetch post');
   }
+
   return response.json();
 };
 
