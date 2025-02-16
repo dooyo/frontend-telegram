@@ -44,6 +44,11 @@ export const MediaPreview = ({
     setIsPlaying(!isPlaying);
   };
 
+  const handleMediaClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(metadata.url, '_blank', 'noopener,noreferrer');
+  };
+
   const renderMediaContent = () => {
     switch (metadata.type) {
       case 'IMAGE':
@@ -110,7 +115,10 @@ export const MediaPreview = ({
 
       case 'URL':
         return (
-          <div className="flex items-start space-x-4 p-4 border rounded-lg bg-card">
+          <div
+            className="flex items-start space-x-4 p-4 border rounded-lg bg-card cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={handleMediaClick}
+          >
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-medium text-foreground truncate">
                 {metadata.title || metadata.url}
