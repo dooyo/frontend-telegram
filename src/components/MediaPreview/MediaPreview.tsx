@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils/cn';
-import { UrlMetadata } from '@/lib/utils/urlUtils';
+import { UrlMetadata, getYouTubeVideoId } from '@/lib/utils/urlUtils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { PlayIcon, PauseIcon, X } from 'lucide-react';
@@ -65,7 +65,27 @@ export const MediaPreview = ({
           />
         );
 
-      case 'VIDEO':
+      case 'VIDEO': {
+        const youtubeId = getYouTubeVideoId(metadata.url);
+        if (youtubeId) {
+          return (
+            <div className="relative aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=0`}
+                title="YouTube video player"
+                className={cn(
+                  'w-full h-full rounded-lg',
+                  isExpanded ? 'max-h-[512px]' : 'max-h-[256px]'
+                )}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onLoad={handleLoadSuccess}
+                onError={handleLoadError}
+              />
+            </div>
+          );
+        }
+
         return (
           <div className="relative group">
             <video
@@ -96,6 +116,7 @@ export const MediaPreview = ({
             </Button>
           </div>
         );
+      }
 
       case 'GIF':
         return (

@@ -33,7 +33,26 @@ export const extractUrls = (text: string): string[] => {
   return text.match(urlRegex) || [];
 };
 
+export const getYouTubeVideoId = (url: string): string | null => {
+  try {
+    const urlObj = new URL(url);
+    if (urlObj.hostname.includes('youtube.com')) {
+      return urlObj.searchParams.get('v');
+    } else if (urlObj.hostname === 'youtu.be') {
+      return urlObj.pathname.slice(1);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 export const getMediaType = (url: string): MediaType => {
+  // First check if it's a YouTube URL
+  if (getYouTubeVideoId(url)) {
+    return 'VIDEO';
+  }
+
   const extension = url.split('.').pop()?.toLowerCase();
 
   if (extension) {
