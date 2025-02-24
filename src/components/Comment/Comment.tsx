@@ -150,7 +150,7 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="text-muted-foreground hover:text-foreground transition-colors px-2"
+                  className="text-[var(--color-icon-default)] hover:text-[var(--color-icon-hover)] transition-colors px-2"
                   onClick={(e) => e.stopPropagation()}
                 >
                   •••
@@ -194,18 +194,30 @@ export const Comment: React.FC<PropsType> = ({ comment }) => {
             <IconButton
               icon="heart-outline"
               number={comment.likes.length}
-              color={comment.likes.includes(me._id) ? 'red' : 'grey'}
+              color={
+                comment.likes.includes(me._id)
+                  ? 'var(--color-icon-active)'
+                  : 'var(--color-icon-default)'
+              }
               onClick={handleLikeComment}
               isPressed={isLikePending}
             />
             <IconButton
               icon="heart-off-outline"
               number={comment.dislikes.length}
-              color={comment.dislikes.includes(me._id) ? 'red' : 'grey'}
+              color={
+                comment.dislikes.includes(me._id)
+                  ? 'var(--color-icon-active)'
+                  : 'var(--color-icon-default)'
+              }
               onClick={handleDislikeComment}
               isPressed={isDislikePending}
             />
-            <IconButton icon="share-outline" onClick={() => {}} />
+            <IconButton
+              icon="share-outline"
+              onClick={() => {}}
+              color="var(--color-icon-default)"
+            />
           </div>
         </div>
       </div>

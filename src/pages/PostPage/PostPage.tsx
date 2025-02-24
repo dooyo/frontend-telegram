@@ -13,6 +13,7 @@ import { PostType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { CommentInput } from '@/components/CommentInput/CommentInput';
 import { Helmet } from 'react-helmet';
+import { cn } from '@/lib/utils/cn';
 
 const COMMENTS_PER_PAGE = 20;
 
@@ -43,7 +44,7 @@ export const PostPage: React.FC = () => {
     isLoading: isLoadingComments,
     refetch: refetchComments
   } = useInfiniteQuery({
-    queryKey: ['comments', id],
+    queryKey: ['comments', post?._id],
     queryFn: ({ pageParam }) =>
       getPostComments(id as string, {
         cursor: pageParam,
@@ -54,13 +55,15 @@ export const PostPage: React.FC = () => {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
-    enabled: !!id && !postError // Don't fetch comments if post not found
+    enabled: !!post?._id && !postError
   });
 
   const onRefresh = async () => {
     setRefreshing(true);
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['post', id] }),
+      queryClient.invalidateQueries({ queryKey: ['post', post?._id] }),
+      queryClient.invalidateQueries({ queryKey: ['comments', post?._id] }),
+      queryClient.invalidateQueries({ queryKey: ['posts'] }),
       refetchComments()
     ]);
     setRefreshing(false);
@@ -130,28 +133,32 @@ export const PostPage: React.FC = () => {
   const allComments = commentsData?.pages.flatMap((page) => page.data) ?? [];
 
   return (
-    <div className="flex flex-col items-center relative min-h-screen bg-background pb-[144px]">
+    <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] via-[#FDE1D3] to-[#FEC6A1]">
       <Helmet>
         <meta property="og:title" content="DooYo Post" />
         <meta property="og:description" content={post?.text || ''} />
         <meta property="og:image" content={post?.user?.avatarUrl || ''} />
       </Helmet>
-      <div className="w-full max-w-3xl px-4">
+
+      <div className="w-full max-w-3xl px-4 mx-auto pt-4 pb-[144px]">
         <Post post={post as PostType} />
 
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={onRefresh}
           disabled={isRefreshing}
-          className="mt-4 w-full"
+          className={cn(
+            'w-full rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-foreground hover:bg-white/20',
+            'mt-4'
+          )}
         >
           {isRefreshing ? 'Refreshing...' : 'Refresh'}
         </Button>
 
         <div className="mt-6 space-y-4">
           {allComments.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8">
+            <div className="text-center text-muted-foreground py-8 glass-card">
               But it feels so empty without me...
             </div>
           ) : (
@@ -162,7 +169,7 @@ export const PostPage: React.FC = () => {
             </div>
           )}
 
-          {/* Loading indicator for next page */}
+          {/* Loading indicator */}
           <div ref={observerTarget} className="w-full py-4">
             {isFetchingNextPage && (
               <div className="flex justify-center">
@@ -173,7 +180,8 @@ export const PostPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-[56px] left-0 right-0 bg-background border-t">
+      {/* Comment input at bottom */}
+      <div className="fixed bottom-[56px] left-0 right-0 glass-card border-t border-white/20">
         <div className="max-w-3xl mx-auto p-4">
           <CommentInput postId={id as string} />
         </div>

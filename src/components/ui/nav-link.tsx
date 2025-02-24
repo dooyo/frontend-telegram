@@ -7,7 +7,7 @@ import {
 interface NavLinkProps extends Omit<RouterNavLinkProps, 'className'> {
   icon?: React.ReactNode;
   label: string;
-  className?: string;
+  className?: string | (({ isActive }: { isActive: boolean }) => string);
 }
 
 export const NavLink = ({ icon, label, className, ...props }: NavLinkProps) => {
@@ -15,21 +15,22 @@ export const NavLink = ({ icon, label, className, ...props }: NavLinkProps) => {
     <RouterNavLink
       {...props}
       className={({ isActive }) =>
-        cn(
-          'flex flex-col items-center justify-center w-full h-full transition-colors',
-          'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary',
-          isActive
-            ? 'text-primary'
-            : 'text-muted-foreground hover:text-primary',
-          className
-        )
+        typeof className === 'function'
+          ? className({ isActive })
+          : cn(
+              'flex flex-col items-center space-y-1 px-3 py-1 rounded-lg transition-colors',
+              isActive
+                ? 'text-primary bg-white/10'
+                : 'text-[var(--color-icon-default)] hover:bg-white/5',
+              className
+            )
       }
       aria-label={label}
       role="link"
       tabIndex={0}
     >
-      {icon && <div className="h-6 w-6">{icon}</div>}
-      <span className="text-xs mt-1">{label}</span>
+      {icon}
+      <span className="text-xs">{label}</span>
     </RouterNavLink>
   );
 };

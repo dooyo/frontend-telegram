@@ -188,11 +188,11 @@ export const ProfilePage: React.FC = () => {
   };
 
   return (
-    <Container className="py-8">
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-        <div className="shrink-0">
-          {displayData?.avatarUrl ? (
-            <div className="relative w-64 h-64 rounded-full overflow-hidden border border-input-border bg-input-background">
+    <div className="min-h-screen bg-gradient-to-br from-dooyo-lavender via-dooyo-peach to-dooyo-rose">
+      <Container className="px-4 pb-20">
+        <div className="flex flex-col md:flex-row items-start gap-8 pt-4">
+          <div className="shrink-0 w-full md:w-auto">
+            {displayData?.avatarUrl ? (
               <Avatar
                 src={displayData.avatarUrl.replace(
                   'localhost',
@@ -200,261 +200,291 @@ export const ProfilePage: React.FC = () => {
                 )}
                 alt={`${displayData.username}'s avatar`}
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
+                  width: '8rem',
+                  height: '8rem',
+                  backgroundColor: '#DFDAD6',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '50%',
+                  backdropFilter: 'blur(2px)',
+                  background: 'rgba(255, 255, 255, 0.1)'
                 }}
                 variant="circle"
                 readOnly
               />
-            </div>
-          ) : (
-            <div className="w-64 h-64 rounded-full bg-input-background border border-input-border flex items-center justify-center">
-              <span className="text-4xl text-muted-foreground">
-                {displayData?.username?.charAt(0)?.toUpperCase() || '?'}
-              </span>
-            </div>
-          )}
-        </div>
-        <div className="w-full space-y-6 max-w-2xl">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold truncate">
-                  {displayData?.username}
-                </h1>
-                {userData?.isPremium && (
-                  <Badge variant="secondary" className="gap-1">
-                    <Crown className="h-3 w-3" />
-                  </Badge>
-                )}
-              </div>
-              <Button
-                onClick={() => setShowShareModal(true)}
-                className="flex items-center gap-2 shrink-0"
-                disabled={false}
-              >
-                <Share className="w-4 h-4" />
-                Share
-              </Button>
-            </div>
-            <p className="text-sm">
-              Expires in:{' '}
-              {displayData?.expiresAt
-                ? timeUntil(displayData?.expiresAt)
-                : 'NEVER'}
-            </p>
-            {isCurrentUser && (
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <LimitsDisplay type="posts" showUpgradeButton={false} />
-                <LimitsDisplay
-                  type="comments"
-                  showUpgradeButton={
-                    limits?.comments.remaining === 0 ||
-                    limits?.posts.remaining === 0
-                  }
-                />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                <span className="text-4xl text-[var(--color-icon-default)]">
+                  {displayData?.username?.charAt(0)?.toUpperCase() || '?'}
+                </span>
               </div>
             )}
           </div>
-
-          {!isLoadingStats && userStats && (
-            <Accordion type="multiple" className="w-full space-y-4">
+          <div className="w-full space-y-6 max-w-2xl">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold truncate">
+                    {displayData?.username}
+                  </h1>
+                  {userData?.isPremium && (
+                    <Badge variant="secondary" className="gap-1">
+                      <Crown className="h-3 w-3" />
+                    </Badge>
+                  )}
+                </div>
+                <Button
+                  onClick={() => setShowShareModal(true)}
+                  className="bg-primary hover:bg-primary/90 text-white shadow-lg transition-all duration-200 hover-scalee flex items-center gap-2 shrink-0"
+                  disabled={false}
+                >
+                  <Share className="w-4 h-4" />
+                  Share
+                </Button>
+              </div>
+              <p className="text-sm text-[var(--color-icon-default)]">
+                Expires in:{' '}
+                {displayData?.expiresAt
+                  ? timeUntil(displayData?.expiresAt)
+                  : 'NEVER'}
+              </p>
               {isCurrentUser && (
-                <AccordionItem value="rewards">
-                  <AccordionTrigger className="text-lg font-medium">
-                    <span>Rewards</span>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="glass-card p-4 hover-scale">
+                    <LimitsDisplay type="posts" showUpgradeButton={false} />
+                  </div>
+                  <div className="glass-card p-4 hover-scale">
+                    <LimitsDisplay
+                      type="comments"
+                      showUpgradeButton={
+                        limits?.comments.remaining === 0 ||
+                        limits?.posts.remaining === 0
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {!isLoadingStats && userStats && (
+              <Accordion type="multiple" className="w-full space-y-4">
+                {isCurrentUser && (
+                  <AccordionItem value="rewards" className="glass-card">
+                    <AccordionTrigger className="text-lg font-medium px-4 text-[var(--color-text)]">
+                      <span>Rewards</span>
+                      <div className="flex items-center gap-2 ml-auto mr-2">
+                        <span className="text-sm text-[var(--color-icon-default)]">
+                          {((totalRewards?.total || 0) + liveRewards).toFixed(
+                            3
+                          )}{' '}
+                          TIME
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-4 p-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-medium text-[var(--color-text)]">
+                              Currently Accumulating
+                            </h3>
+                            <span className="text-sm text-[var(--color-icon-default)]">
+                              {liveRewards.toFixed(3)} TIME
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-white/10 my-4"></div>
+
+                        <h3 className="font-medium text-[var(--color-text)]">
+                          Settled Rewards
+                        </h3>
+                        {isLoadingRewardsHistory ? (
+                          <div className="flex justify-center py-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[var(--color-icon-default)]"></div>
+                          </div>
+                        ) : rewardsHistory?.rewards &&
+                          rewardsHistory.rewards.length > 0 ? (
+                          <div className="space-y-3">
+                            {rewardsHistory.rewards.map((reward) => (
+                              <div
+                                key={reward._id}
+                                className="flex items-center justify-between p-3 rounded-lg glass-card hover-scale"
+                              >
+                                <div className="flex items-center gap-2">
+                                  {reward.type === 'POST_LIFETIME' ? (
+                                    <Clock className="w-4 h-4 text-[var(--color-icon-default)]" />
+                                  ) : (
+                                    <MessageSquare className="w-4 h-4 text-[var(--color-icon-default)]" />
+                                  )}
+                                  <span className="text-sm font-medium text-[var(--color-text)]">
+                                    {reward.amount.toFixed(3)} TIME
+                                  </span>
+                                  <span className="text-xs text-[var(--color-icon-default)]">
+                                    {timeUntil(reward.contentExpiredAt)} ago
+                                    from{' '}
+                                    {reward.type === 'POST_LIFETIME'
+                                      ? 'post'
+                                      : 'comment'}{' '}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[var(--color-icon-default)] text-center py-4">
+                            No settled rewards yet
+                          </p>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
+                <AccordionItem value="live-posts" className="glass-card">
+                  <AccordionTrigger className="text-lg font-medium px-4 text-[var(--color-text)]">
+                    <span>Live Posts</span>
                     <div className="flex items-center gap-2 ml-auto mr-2">
-                      <span className="text-sm text-muted-foreground">
-                        {((totalRewards?.total || 0) + liveRewards).toFixed(3)}{' '}
-                        TIME
+                      <span className="text-sm text-[var(--color-icon-default)]">
+                        ({userPosts?.data.length || 0})
                       </span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-4 p-4">
-                      {/* Live Rewards Section */}
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-medium">
-                            Currently Accumulating
-                          </h3>
-                          <span className="text-sm text-muted-foreground">
-                            {liveRewards.toFixed(3)} TIME
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="border-t border-border my-4"></div>
-
-                      {/* Existing Rewards History Section */}
-                      <h3 className="font-medium">Settled Rewards</h3>
-                      {isLoadingRewardsHistory ? (
+                      {isLoadingPosts ? (
                         <div className="flex justify-center py-4">
-                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[var(--color-icon-default)]"></div>
                         </div>
-                      ) : rewardsHistory?.rewards &&
-                        rewardsHistory.rewards.length > 0 ? (
-                        <div className="space-y-3">
-                          {rewardsHistory.rewards.map((reward) => (
-                            <div
-                              key={reward._id}
-                              className="flex items-center justify-between p-3 rounded-lg bg-accent/5"
-                            >
-                              <div className="flex items-center gap-2">
-                                {reward.type === 'POST_LIFETIME' ? (
-                                  <Clock className="w-4 h-4 text-primary" />
-                                ) : (
-                                  <MessageSquare className="w-4 h-4 text-primary" />
-                                )}
-                                <span className="text-sm font-medium">
-                                  {reward.amount.toFixed(3)} TIME
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {timeUntil(reward.contentExpiredAt)} ago from{' '}
-                                  {reward.type === 'POST_LIFETIME'
-                                    ? 'post'
-                                    : 'comment'}{' '}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                      ) : userPosts?.data && userPosts.data.length > 0 ? (
+                        userPosts.data.map((post) => (
+                          <div key={post._id} className="hover-scale">
+                            <Post post={post} />
+                          </div>
+                        ))
                       ) : (
-                        <p className="text-muted-foreground text-center py-4">
-                          No settled rewards yet
+                        <p className="text-[var(--color-icon-default)] text-center py-4">
+                          No posts yet
                         </p>
                       )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-              )}
 
-              <AccordionItem value="live-posts">
-                <AccordionTrigger className="text-lg font-medium">
-                  <span>Live Posts</span>
-                  <div className="flex items-center gap-2 ml-auto mr-2">
-                    <span className="text-sm text-muted-foreground">
-                      ({userPosts?.data.length || 0})
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-4">
-                    {isLoadingPosts ? (
-                      <div className="flex justify-center py-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                      </div>
-                    ) : userPosts?.data && userPosts.data.length > 0 ? (
-                      userPosts.data.map((post) => (
-                        <Post key={post._id} post={post} />
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground text-center py-4">
-                        No posts yet
-                      </p>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="live-comments">
-                <AccordionTrigger className="text-lg font-medium">
-                  <span>Live Comments</span>
-                  <div className="flex items-center gap-2 ml-auto mr-2">
-                    <span className="text-sm text-muted-foreground">
-                      ({userComments?.data.length || 0})
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-4">
-                    {isLoadingComments ? (
-                      <div className="flex justify-center py-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                      </div>
-                    ) : userComments?.data && userComments.data.length > 0 ? (
-                      userComments.data.map((comment) => (
-                        <div
-                          key={comment._id}
-                          onClick={() =>
-                            navigate(`/post/${(comment.post as any)._id}`)
-                          }
-                          className="cursor-pointer hover:bg-accent/5"
-                        >
-                          <Comment comment={comment} />
+                <AccordionItem value="live-comments" className="glass-card">
+                  <AccordionTrigger className="text-lg font-medium px-4 text-[var(--color-text)]">
+                    <span>Live Comments</span>
+                    <div className="flex items-center gap-2 ml-auto mr-2">
+                      <span className="text-sm text-[var(--color-icon-default)]">
+                        ({userComments?.data.length || 0})
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 p-4">
+                      {isLoadingComments ? (
+                        <div className="flex justify-center py-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[var(--color-icon-default)]"></div>
                         </div>
-                      ))
-                    ) : (
-                      <p className="text-muted-foreground text-center py-4">
-                        No comments yet
-                      </p>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="stats">
-                <AccordionTrigger className="text-lg font-medium">
-                  User Statistics
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                    <div className="space-y-2 rounded-lg p-4 bg-accent/5">
-                      <h2 className="font-medium">Comments</h2>
-                      <ul className="space-y-1 text-sm">
-                        <li>Total: {userStats.totalComments}</li>
-                        <li>Likes: {userStats.totalCommentsLikes}</li>
-                        <li>Dislikes: {userStats.totalCommentsDislikes}</li>
-                        <li>
-                          Duration:{' '}
-                          {timeDurationCalculator(
-                            userStats.totalCommentsDuration
-                          )}
-                        </li>
-                      </ul>
+                      ) : userComments?.data && userComments.data.length > 0 ? (
+                        userComments.data.map((comment) => (
+                          <div
+                            key={comment._id}
+                            onClick={() =>
+                              navigate(`/post/${(comment.post as any)._id}`)
+                            }
+                            className="hover-scale cursor-pointer"
+                          >
+                            <Comment comment={comment} />
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-[var(--color-icon-default)] text-center py-4">
+                          No comments yet
+                        </p>
+                      )}
                     </div>
-                    <div className="space-y-2 rounded-lg p-4 bg-accent/5">
-                      <h2 className="font-medium">Posts</h2>
-                      <ul className="space-y-1 text-sm">
-                        <li>Total: {userStats.totalPosts}</li>
-                        <li>Likes: {userStats.totalPostsLikes}</li>
-                        <li>Dislikes: {userStats.totalPostsDislikes}</li>
-                        <li>
-                          Duration:{' '}
-                          {timeDurationCalculator(userStats.totalPostsDuration)}
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          )}
+                  </AccordionContent>
+                </AccordionItem>
 
-          <div className="flex gap-4 items-center">
-            {isCurrentUser ? (
-              <Button disabled={false} onClick={handleLogout}>
-                Logout
-              </Button>
-            ) : (
-              <>
-                <Button disabled={isFollowPending} onClick={handleFollow}>
-                  {isFollowing ? 'Unfollow' : 'Follow'}
-                </Button>
-                {isUserFollowing && (
-                  <p className="text-sm text-muted-foreground">
-                    This user is following you 🤗
-                  </p>
-                )}
-              </>
+                <AccordionItem value="stats" className="glass-card">
+                  <AccordionTrigger className="text-lg font-medium px-4 text-[var(--color-text)]">
+                    User Statistics
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+                      <div className="space-y-2 rounded-lg p-4 glass-card hover-scale">
+                        <h2 className="font-medium text-[var(--color-text)]">
+                          Comments
+                        </h2>
+                        <ul className="space-y-1 text-sm text-[var(--color-icon-default)]">
+                          <li>Total: {userStats.totalComments}</li>
+                          <li>Likes: {userStats.totalCommentsLikes}</li>
+                          <li>Dislikes: {userStats.totalCommentsDislikes}</li>
+                          <li>
+                            Duration:{' '}
+                            {timeDurationCalculator(
+                              userStats.totalCommentsDuration
+                            )}
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="space-y-2 rounded-lg p-4 glass-card hover-scale">
+                        <h2 className="font-medium text-[var(--color-text)]">
+                          Posts
+                        </h2>
+                        <ul className="space-y-1 text-sm text-[var(--color-icon-default)]">
+                          <li>Total: {userStats.totalPosts}</li>
+                          <li>Likes: {userStats.totalPostsLikes}</li>
+                          <li>Dislikes: {userStats.totalPostsDislikes}</li>
+                          <li>
+                            Duration:{' '}
+                            {timeDurationCalculator(
+                              userStats.totalPostsDuration
+                            )}
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             )}
+
+            <div className="flex gap-4 items-center">
+              {isCurrentUser ? (
+                <Button
+                  disabled={false}
+                  onClick={handleLogout}
+                  className="bg-primary hover:bg-primary/90 text-white shadow-lg transition-all duration-200 hover-scale"
+                >
+                  Logout
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    disabled={isFollowPending}
+                    onClick={handleFollow}
+                    className="bg-primary hover:bg-primary/90 text-white shadow-lg transition-all duration-200 hover-scale"
+                  >
+                    {isFollowing ? 'Unfollow' : 'Follow'}
+                  </Button>
+                  {isUserFollowing && (
+                    <p className="text-sm text-[var(--color-icon-default)]">
+                      This user is following you 🤗
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      {showShareModal && (
-        <ShareModal userId={userId} onClose={() => setShowShareModal(false)} />
-      )}
-    </Container>
+        {showShareModal && (
+          <ShareModal
+            userId={userId}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
+      </Container>
+    </div>
   );
 };

@@ -5,7 +5,7 @@ import { getMyFollowings } from '@/lib/api/followers';
 import { Post } from '@/components/Post/Post';
 import { Link } from 'react-router-dom';
 import { PostType } from '@/lib/types';
-import { PenSquare, Users, Hourglass, RotateCw } from 'lucide-react';
+import { PenSquare, Users, RotateCw } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { cn } from '@/lib/utils/cn';
@@ -131,112 +131,140 @@ export const FeedPage: FC = () => {
 
   if (isLoading && !isRefreshing) {
     return (
-      <Container className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </Container>
+      <div className="min-h-screen">
+        <Container className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+          <div className="animate-float">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white/80"></div>
+          </div>
+        </Container>
+      </div>
     );
   }
 
   if (isError) {
     return (
-      <Container>
-        <p className="text-destructive text-center mt-4">
-          Error: {(error as Error).message}
-        </p>
-      </Container>
+      <div className="min-h-screen">
+        <Container>
+          <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
+            <p className="text-white/80 text-center mt-4 animate-fade-up">
+              Error: {(error as Error).message}
+            </p>
+            <Button
+              onClick={() => refetch()}
+              className="glass-button hover-scale mt-4 animate-fade-up"
+            >
+              Try Again
+            </Button>
+          </div>
+        </Container>
+      </div>
     );
   }
 
   const allPosts = data?.pages.flatMap((page) => page.data) ?? [];
 
   return (
-    <Container className="pb-20">
-      <div className="flex flex-col items-center w-full">
-        <div className="flex gap-2 mt-4 mb-4">
-          <Button
-            onClick={() => handleFilterClick('frens')}
-            variant={activeFilter === 'frens' ? 'default' : 'outline'}
-            className={cn(
-              'flex items-center gap-2',
-              activeFilter === 'frens' && 'bg-primary text-primary-foreground'
-            )}
-          >
-            <Users className="w-4 h-4" />
-            Frens
-          </Button>
-          <Button
-            onClick={() => handleFilterClick('fading')}
-            variant={activeFilter === 'fading' ? 'default' : 'outline'}
-            className={cn(
-              'flex items-center gap-2',
-              activeFilter === 'fading' && 'bg-primary text-primary-foreground'
-            )}
-          >
-            <Hourglass className="w-4 h-4" />
-            Fading
-          </Button>
-          <Button
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            variant="outline"
-            size="icon"
-            className={cn('ml-auto', isRefreshing && 'animate-spin')}
-            aria-label="Refresh posts"
-          >
-            <RotateCw className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {activeFilter === 'frens' && followingIds.length === 0 ? (
-          <div className="text-center text-muted-foreground py-8">
-            You're not following anyone yet. Follow some users to see their
-            posts here!
+    <div className="min-h-screen">
+      <Container className="px-4 pb-20 pt-4">
+        <div className="flex flex-col items-center w-full">
+          <div className="filters-scroll flex items-center gap-2 mb-6 overflow-x-auto py-2 w-full max-w-3xl mx-auto">
+            <Button
+              onClick={() => handleFilterClick('frens')}
+              className={cn(
+                'rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-[var(--color-icon-default)] hover:bg-white/20 transition-colors duration-200',
+                activeFilter === 'frens' &&
+                  'bg-white/30 border-primary/50 text-primary'
+              )}
+            >
+              Frens
+            </Button>
+            <Button
+              onClick={() => handleFilterClick('fading')}
+              className={cn(
+                'rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-[var(--color-icon-default)] hover:bg-white/20 transition-colors duration-200',
+                activeFilter === 'fading' &&
+                  'bg-white/30 border-primary/50 text-primary'
+              )}
+            >
+              Fading
+            </Button>
+            <Button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              size="icon"
+              className={cn(
+                'rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-foreground hover:bg-white/20 ml-auto transition-colors duration-200',
+                isRefreshing && 'animate-spin'
+              )}
+              aria-label="Refresh posts"
+            >
+              <RotateCw className="w-4 h-4 text-[#B4A5FF]" />
+            </Button>
           </div>
-        ) : (
-          <>
-            <ul className="w-full max-w-2xl space-y-4">
-              {allPosts.map((post: PostType) => (
-                <li key={post._id}>
-                  <Post post={post} />
-                </li>
-              ))}
-            </ul>
 
-            {/* Loading indicator for next page */}
-            <div ref={observerTarget} className="w-full py-8">
-              {isFetchingNextPage && (
-                <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                </div>
-              )}
-              {!hasNextPage && allPosts.length > 0 && (
-                <p className="text-center text-muted-foreground">
-                  No more posts to load
-                </p>
-              )}
+          {activeFilter === 'frens' && followingIds.length === 0 ? (
+            <div className="glass-card flex flex-col items-center justify-center py-12 px-4 text-center animate-fade-up max-w-md mx-auto">
+              <Users className="w-12 h-12 mb-4 text-white" />
+              <p className="text-lg mb-4 text-white">
+                You're not following anyone yet
+              </p>
+              <p className="text-sm mb-6 text-white/80">
+                Follow some users to see their posts here!
+              </p>
+              <Button
+                asChild
+                variant="outline"
+                className="glass-card hover-scale"
+              >
+                <Link to="/friends">Find Friends</Link>
+              </Button>
             </div>
-          </>
-        )}
+          ) : (
+            <>
+              <div className="w-full max-w-3xl mx-auto space-y-4">
+                {allPosts.map((post: PostType) => (
+                  <div
+                    key={`${post._id}-${activeFilter}`}
+                    className="hover-scale"
+                  >
+                    <Post post={post} />
+                  </div>
+                ))}
+              </div>
 
-        <Button
-          asChild
-          className="fixed bottom-20 right-4 sm:right-8 z-50 rounded-full w-14 h-14 p-0"
-          size="icon"
-        >
-          <Link
-            to="/newPost"
-            className={buttonVariants({
-              variant: 'default',
-              size: 'icon',
-              className:
-                'fixed bottom-20 right-4 sm:right-8 z-50 rounded-full w-14 h-14 p-0'
-            })}
-          >
-            <PenSquare className="w-6 h-6" />
-            <span className="sr-only">Create new post</span>
-          </Link>
-        </Button>
-      </div>
-    </Container>
+              <div ref={observerTarget} className="w-full py-8">
+                {isFetchingNextPage && (
+                  <div className="flex justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
+                  </div>
+                )}
+                {!hasNextPage && allPosts.length > 0 && (
+                  <p className="text-center text-[var(--color-icon-default)]">
+                    You've caught up! No more posts to load
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </Container>
+
+      <Button
+        asChild
+        className={cn(
+          buttonVariants({
+            variant: 'default',
+            size: 'icon',
+            className:
+              'fixed bottom-20 right-4 sm:right-8 z-50 rounded-full w-14 h-14 p-0 bg-[var(--color-text)] hover:bg-[var(--color-text)]/90 text-white shadow-lg transition-all duration-200 hover-scale'
+          })
+        )}
+      >
+        <Link to="/newPost">
+          <PenSquare className="w-6 h-6" />
+          <span className="sr-only">Create new post</span>
+        </Link>
+      </Button>
+    </div>
   );
 };

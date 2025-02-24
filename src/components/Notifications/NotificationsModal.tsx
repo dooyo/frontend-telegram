@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import {
   useInfiniteQuery,
   useMutation,
@@ -32,6 +32,17 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [shouldRenderContent, setShouldRenderContent] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      // Delay content rendering until after animation starts
+      const timer = setTimeout(() => setShouldRenderContent(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setShouldRenderContent(false);
+    }
+  }, [open]);
 
   const {
     data,
@@ -52,7 +63,7 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
       lastPage.hasMore ? lastPage.nextCursor : undefined,
     refetchInterval: 30000,
     refetchOnWindowFocus: true,
-    enabled: open
+    enabled: open && shouldRenderContent
   });
 
   const { mutateAsync: markAsReadMutation } = useMutation({
@@ -102,33 +113,43 @@ export const NotificationsModal: FC<NotificationsModalProps> = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-lg flex flex-col p-0"
+        className="w-full sm:max-w-lg flex flex-col p-0 bg-gradient-to-br from-dooyo-lavender via-dooyo-peach to-dooyo-rose border-none"
       >
-        <SheetHeader className="p-6 border-b">
+        <SheetHeader className="p-6 glass-card">
           <div className="flex items-center justify-between">
-            <SheetTitle>Notifications</SheetTitle>
-            {hasUnread && (
-              <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead}>
+            <SheetTitle className="text-2xl font-bold text-[var(--color-text)]">
+              Notifications
+            </SheetTitle>
+            {shouldRenderContent && hasUnread && (
+              <Button
+                size="sm"
+                onClick={handleMarkAllAsRead}
+                className="bg-primary hover:bg-primary/80 text-white shadow-lg transition-all duration-200 hover-scale"
+              >
                 Mark all as read
               </Button>
             )}
           </div>
-          <SheetDescription>
+          <SheetDescription className="text-[var(--color-icon-default)]">
             View and manage your notifications
           </SheetDescription>
         </SheetHeader>
-        <div className="flex-1 overflow-y-auto">
-          <NotificationsList
-            notifications={allNotifications}
-            isLoading={isLoading}
-            isFetchingNextPage={isFetchingNextPage}
-            hasNextPage={hasNextPage}
-            onLoadMore={fetchNextPage}
-            onRefresh={handleRefresh}
-            onNotificationRead={handleNotificationRead}
-            isRefreshing={isRefreshing}
-            onOpenChange={onOpenChange}
-          />
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          {shouldRenderContent ? (
+            <NotificationsList
+              notifications={allNotifications}
+              isLoading={isLoading}
+              isFetchingNextPage={isFetchingNextPage}
+              hasNextPage={hasNextPage}
+              onLoadMore={fetchNextPage}
+              onRefresh={handleRefresh}
+              onNotificationRead={handleNotificationRead}
+              isRefreshing={isRefreshing}
+              onOpenChange={onOpenChange}
+            />
+          ) : (
+            <div className="w-full h-full" />
+          )}
         </div>
       </SheetContent>
     </Sheet>

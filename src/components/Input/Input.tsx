@@ -1,5 +1,6 @@
 import { ChangeEvent, useState, type FC } from 'react';
 import { X } from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
 
 interface InputProps {
   title?: string;
@@ -10,6 +11,9 @@ interface InputProps {
   placeholder?: string;
   type?: 'email' | 'password' | 'text';
   hasError?: boolean;
+  style?: React.CSSProperties;
+  containerClassName?: string;
+  inputClassName?: string;
 }
 
 export const Input: FC<InputProps> = ({
@@ -20,7 +24,10 @@ export const Input: FC<InputProps> = ({
   type = 'text',
   placeholder = '',
   disabled = false,
-  hasError = false
+  hasError = false,
+  style,
+  containerClassName,
+  inputClassName
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [inputType, setInputType] = useState(type);
@@ -49,15 +56,22 @@ export const Input: FC<InputProps> = ({
         </label>
       )}
       <div
-        className={`group relative flex items-center bg-[#dfdad6] border border-[#cbc3be] rounded-[10px] px-4 h-11
-        ${disabled ? 'bg-[#efedeb] border-[#b4ada7]' : ''}
-        ${hasError ? 'border-destructive' : ''}
-        ${!disabled && 'hover:border-[#7a6d64]'}
-        focus-within:border-[#7a6d64] focus-within:outline focus-within:outline-1 focus-within:outline-[#7a6d64]`}
+        className={cn(
+          'group relative flex items-center bg-transparent rounded-[10px] px-4 h-11',
+          'focus-within:outline-none',
+          hasError && 'border-destructive focus-within:ring-destructive',
+          containerClassName
+        )}
+        style={style}
       >
         <input
           id={title?.toLowerCase().replace(' ', '-')}
-          className="peer w-full bg-transparent outline-hidden text-base disabled:opacity-50"
+          className={cn(
+            'peer w-full bg-transparent outline-none text-base disabled:opacity-50',
+            'placeholder:text-[var(--color-icon-default)]',
+            hasError && 'text-destructive placeholder:text-destructive/50',
+            inputClassName
+          )}
           type={inputType}
           placeholder={placeholder}
           value={value}

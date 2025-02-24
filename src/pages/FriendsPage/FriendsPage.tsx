@@ -12,6 +12,8 @@ import { Button } from '@/components/Button/Button';
 import { UserPlus } from 'lucide-react';
 import { Container } from '@/components/ui/container';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { cn } from '@/lib/utils/cn';
+import { motion } from 'framer-motion';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -81,6 +83,16 @@ export const FriendsPage: React.FC = () => {
     }
   };
 
+  const handleFollow = async (userId: string) => {
+    try {
+      await postFollow(userId);
+      queryClient.invalidateQueries({ queryKey: ['followers'] });
+      queryClient.invalidateQueries({ queryKey: ['followings'] });
+    } catch (error) {
+      console.error('Failed to follow user:', error);
+    }
+  };
+
   // Intersection Observer callback
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
@@ -134,43 +146,73 @@ export const FriendsPage: React.FC = () => {
     return (
       <div
         key={user?._id || item._id}
-        className="flex items-center p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+        className="glass-card p-4 transition-all duration-200 hover:scale-[1.02] cursor-pointer"
         onClick={() => {
           if (!isDeletedUser) {
             navigate(`/profile/${user._id}`);
           }
         }}
-        style={{ cursor: isDeletedUser ? 'default' : 'pointer' }}
       >
-        <Avatar
-          src={user?.avatarUrl?.replace('localhost', '10.100.102.18')}
-          alt={user?.username || 'Deleted User'}
-          style={{
-            width: '50px',
-            height: '50px',
-            backgroundColor: '#DFDAD6',
-            border: '1px',
-            borderStyle: 'solid',
-            borderColor: '#CBC3BE'
-          }}
-          variant="circle"
-          readOnly
-        />
-        <span className="flex-1 ml-2.5">
-          {isDeletedUser ? 'Deleted User' : `@${user.username}`}
-        </span>
-        {tabIndex === 1 && (
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleUnfollow(user._id);
+        <div className="flex items-center gap-3">
+          <Avatar
+            src={user?.avatarUrl?.replace('localhost', '10.100.102.18')}
+            alt={user?.username || 'Deleted User'}
+            style={{
+              width: '40px',
+              height: '40px',
+              backgroundColor: '#DFDAD6',
+              border: '1px solid #CBC3BE',
+              borderRadius: '50%'
             }}
-            disabled={false}
-            className="text-sm"
-          >
-            Unfollow
-          </Button>
-        )}
+            variant="circle"
+            readOnly
+          />
+          <div className="flex flex-col flex-1">
+            <span className="font-medium text-foreground">
+              {isDeletedUser ? 'Deleted User' : user.username}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {isDeletedUser ? '' : `@${user.username}`}
+            </span>
+          </div>
+          {tabIndex === 1 ? (
+            <Button
+              disabled={false}
+              className={cn(
+                'rounded-full px-4 py-1 text-sm font-medium',
+                'bg-[#F0CFD4] hover:bg-[#F0CFD4]/80',
+                'text-primary hover:text-primary/90',
+                'transition-colors duration-200'
+              )}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUnfollow(user._id);
+              }}
+            >
+              Unfollow
+            </Button>
+          ) : (
+            // TODO: Update backend's response and change to
+            // !item.isFollowingBack && (
+            item.isFollowingBack && (
+              <Button
+                disabled={false}
+                className={cn(
+                  'rounded-full px-4 py-1 text-sm font-medium',
+                  'bg-[#F0CFD4] hover:bg-[#F0CFD4]/80',
+                  'text-primary hover:text-primary/90',
+                  'transition-colors duration-200'
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleFollow(user._id);
+                }}
+              >
+                Follow
+              </Button>
+            )
+          )}
+        </div>
       </div>
     );
   };
@@ -197,79 +239,104 @@ export const FriendsPage: React.FC = () => {
   const followingsCount = followingsData?.pages[0]?.total ?? 0;
 
   return (
-    <Container>
-      <div className="space-y-4">
-        <div className="sticky top-0 bg-background pt-4 pb-2 space-y-4 z-10 border-b border-input-border">
-          <Input
-            type="text"
-            placeholder={`Search my ${
-              tabIndex === 0 ? 'followers' : 'followings'
-            }`}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            value={searchQuery}
-            onReset={() => setSearchQuery('')}
-          />
-          <div className="flex">
-            <div
-              className={`flex-1 text-center py-2 cursor-pointer border-b-2 ${
-                tabIndex === 0 ? 'border-primary' : 'border-transparent'
-              }`}
-              onClick={() => handleTabChange(0)}
-            >
-              <span className="font-medium">Followers</span>
-              <span className="ml-2 text-sm text-muted-foreground">
-                {followersCount}
-              </span>
+    <div className="min-h-screen">
+      <Container>
+        <div className="space-y-4 p-4">
+          <div className="sticky top-0 space-y-4 z-10">
+            {/* Search Input */}
+            <div className="glass-card rounded-2xl p-2">
+              <Input
+                type="text"
+                placeholder={`Search my ${
+                  tabIndex === 0 ? 'followers' : 'followings'
+                }`}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchQuery}
+                onReset={() => setSearchQuery('')}
+                containerClassName="bg-transparent"
+                inputClassName="text-sm font-medium"
+              />
             </div>
-            <div
-              className={`flex-1 text-center py-2 cursor-pointer border-b-2 ${
-                tabIndex === 1 ? 'border-primary' : 'border-transparent'
-              }`}
-              onClick={() => handleTabChange(1)}
-            >
-              <span className="font-medium">Following</span>
-              <span className="ml-2 text-sm text-muted-foreground">
-                {followingsCount}
-              </span>
+
+            {/* Tabs Card */}
+            <div className="glass-card rounded-2xl p-1 flex relative">
+              {/* Sliding Background */}
+              <motion.div
+                className="absolute h-full w-1/2 bg-white/10 rounded-xl"
+                animate={{ x: tabIndex === 0 ? '0%' : '100%' }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              />
+
+              {/* Followers Tab */}
+              <button
+                className={cn(
+                  'flex-1 relative py-2 rounded-xl transition-colors',
+                  'font-medium text-sm',
+                  tabIndex === 0 ? 'text-primary' : 'text-muted-foreground'
+                )}
+                onClick={() => handleTabChange(0)}
+              >
+                <span>Followers</span>
+                <span className="ml-1 text-muted-foreground">
+                  {followersCount}
+                </span>
+              </button>
+
+              {/* Following Tab */}
+              <button
+                className={cn(
+                  'flex-1 relative py-2 rounded-xl transition-colors',
+                  'font-medium text-sm',
+                  tabIndex === 1 ? 'text-primary' : 'text-muted-foreground'
+                )}
+                onClick={() => handleTabChange(1)}
+              >
+                <span>Following</span>
+                <span className="ml-1 text-muted-foreground">
+                  {followingsCount}
+                </span>
+              </button>
             </div>
           </div>
-        </div>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <div className="space-y-2">
+            {filteredData.map((item) => renderUser(item))}
           </div>
-        ) : (
-          <div>
-            {filteredData.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No {tabIndex === 0 ? 'followers' : 'following'} found
-              </div>
-            ) : (
-              <div className="divide-y divide-input-border">
-                {filteredData.map((item) => renderUser(item))}
 
-                {/* Loading indicator for next page */}
-                <div ref={observerTarget} className="w-full py-4">
-                  {isFetchingNext && (
-                    <div className="flex justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-                    </div>
-                  )}
+          {/* Loading states */}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : filteredData.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground glass-card rounded-lg">
+              No {tabIndex === 0 ? 'followers' : 'following'} found
+            </div>
+          ) : (
+            <div ref={observerTarget} className="w-full py-4">
+              {isFetchingNext && (
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+              )}
+            </div>
+          )}
 
-      <Link
-        to="/friendsSearch"
-        className="fixed bottom-20 right-4 sm:right-8 z-50 rounded-full w-14 h-14 bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 transition-colors"
-      >
-        <UserPlus className="w-6 h-6" />
-        <span className="sr-only">Add new friends</span>
-      </Link>
-    </Container>
+          {/* Add friend button */}
+          <Link
+            to="/friendsSearch"
+            className={cn(
+              'fixed bottom-20 right-4 sm:right-8 z-50 rounded-full w-14 h-14',
+              'bg-[var(--color-text)] hover:bg-[var(--color-text)]/90 text-white shadow-lg',
+              'flex items-center justify-center',
+              'transition-all duration-200 hover-scale'
+            )}
+          >
+            <UserPlus className="w-6 h-6" />
+            <span className="sr-only">Add new friends</span>
+          </Link>
+        </div>
+      </Container>
+    </div>
   );
 };

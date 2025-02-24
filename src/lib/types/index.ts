@@ -52,4 +52,5 @@ export interface Following {
   followerUser: UserType;
   createdAt: string;
   updatedAt: string;
+  isFollowingBack: boolean;
 }

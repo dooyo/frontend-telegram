@@ -23,7 +23,9 @@ function getTimeInSeconds(expiresAt: string) {
 export function useTimeAnimation({
   expiresAt
 }: UseTimeAnimationProps): UseTimeAnimationReturn {
-  const [timeChangeColor, setTimeChangeColor] = useState('gray');
+  const [timeChangeColor, setTimeChangeColor] = useState(
+    'var(--color-icon-default)'
+  );
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentTime, setCurrentTime] = useState(timeUntil(expiresAt));
 
@@ -40,7 +42,7 @@ export function useTimeAnimation({
 
       // Reset color when animation completes (velocity near zero)
       if (Math.abs(displayTime.getVelocity()) < 0.1 && isAnimating) {
-        setTimeChangeColor('gray');
+        setTimeChangeColor('var(--color-icon-default)');
         setIsAnimating(false);
       }
     });
@@ -61,7 +63,7 @@ export function useTimeAnimation({
   const handleTimeDecrease = () => {
     if (!canAnimate()) return;
     setIsAnimating(true);
-    setTimeChangeColor('#ef4444');
+    setTimeChangeColor('var(--color-icon-active)');
     lifetime.set(lifetime.get() - 3600);
   };
 

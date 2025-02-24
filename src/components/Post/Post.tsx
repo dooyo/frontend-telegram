@@ -70,7 +70,8 @@ export const Post = ({ post }: PropsType) => {
     }
   });
 
-  const handleLikePost = async () => {
+  const handleLikePost = async (e: React.TouchEvent | React.MouseEvent) => {
+    e.stopPropagation();
     try {
       if (!hasReacted) {
         handleTimeIncrease();
@@ -81,7 +82,8 @@ export const Post = ({ post }: PropsType) => {
     }
   };
 
-  const handleDislikePost = async () => {
+  const handleDislikePost = async (e: React.TouchEvent | React.MouseEvent) => {
+    e.stopPropagation();
     try {
       if (!hasReacted) {
         handleTimeDecrease();
@@ -118,127 +120,140 @@ export const Post = ({ post }: PropsType) => {
     alert('Report functionality coming soon!');
   };
 
+  const handleCommentClick = (e: React.TouchEvent | React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/post/${post._id}`);
+  };
+
+  const handleShareClick = (e: React.TouchEvent | React.MouseEvent) => {
+    e.stopPropagation();
+    setShowShareModal(true);
+  };
+
   return (
     <>
       <div
-        className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-xs cursor-pointer"
+        className="glass-card p-4 transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
         onClick={handlePostClick}
       >
-        <Avatar
-          src={
-            post.user.avatarUrl
-              ? post.user.avatarUrl.replace('localhost', '10.100.102.18')
-              : 'https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png'
-          }
-          alt={`${post.user.username}'s avatar`}
-          style={{
-            width: '50px',
-            height: '50px',
-            backgroundColor: '#DFDAD6',
-            border: '1px',
-            borderStyle: 'solid',
-            borderColor: '#CBC3BE'
-          }}
-          variant="circle"
-          readOnly
-          onClick={handleUserClick}
-        />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <Avatar
+              src={post.user.avatarUrl?.replace('localhost', '10.100.102.18')}
+              alt={`${post.user.username}'s avatar`}
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#DFDAD6',
+                border: '1px solid #CBC3BE',
+                borderRadius: '50%'
+              }}
+              variant="circle"
+              readOnly
+              onClick={handleUserClick}
+            />
             <div className="flex flex-col">
-              <button
-                className="text-foreground font-semibold hover:underline text-left"
-                onClick={handleUserClick}
-              >
-                {post.user.username}
-              </button>
-              <button
-                className="text-muted-foreground text-sm hover:underline text-left"
+              <span
+                className="font-medium text-foreground"
                 onClick={handleUserClick}
               >
                 @{post.user.username}
-              </button>
+              </span>
             </div>
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className="text-muted-foreground hover:text-foreground transition-colors px-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  •••
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {isMyPost && (
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={handleDelete}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={handleReport}>
-                  <Flag className="w-4 h-4 mr-2" />
-                  Report
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
+
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="text-[var(--color-icon-default)] hover:text-[var(--color-icon-hover)] transition-colors px-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                •••
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {isMyPost && (
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={handleReport}>
+                <Flag className="w-4 h-4 mr-2" />
+                Report
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="mt-3 text-foreground">
           <ContentText
             text={post.text}
-            className="mt-2 text-foreground"
+            className="leading-relaxed"
             onPostClick={handlePostClick}
           />
         </div>
-      </div>
-      <div
-        className="flex items-center justify-between mt-4 px-2"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <IconButton
-          icon="comment-outline"
-          number={post.commentCount}
-          onClick={() => navigate(`/post/${post._id}`)}
-        />
-        <div ref={clockButtonRef}>
+
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/10">
+          <div className="flex items-center gap-6">
+            <div ref={clockButtonRef}>
+              <IconButton
+                icon="clock-outline"
+                color={timeChangeColor}
+                number={
+                  <motion.div
+                    style={{ color: timeChangeColor }}
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {currentTime}
+                  </motion.div>
+                }
+              />
+            </div>
+            <div ref={likeButtonRef}>
+              <IconButton
+                icon="heart-outline"
+                number={post.likes.length}
+                color={
+                  post.likes.includes(me._id)
+                    ? 'var(--color-icon-active)'
+                    : 'var(--color-icon-default)'
+                }
+                onClick={handleLikePost}
+                isPressed={isLikePending}
+              />
+            </div>
+            <div ref={dislikeButtonRef}>
+              <IconButton
+                icon="heart-off-outline"
+                number={post.dislikes.length}
+                color={
+                  post.dislikes.includes(me._id)
+                    ? 'var(--color-icon-active)'
+                    : 'var(--color-icon-default)'
+                }
+                onClick={handleDislikePost}
+                isPressed={isDislikePending}
+              />
+            </div>
+            <IconButton
+              icon="comment-outline"
+              number={post.commentCount}
+              onClick={handleCommentClick}
+              color="var(--color-icon-default)"
+            />
+          </div>
           <IconButton
-            icon="clock-outline"
-            color={timeChangeColor}
-            number={
-              <motion.div
-                style={{ color: timeChangeColor }}
-                initial={{ scale: 1 }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 0.3 }}
-              >
-                {currentTime}
-              </motion.div>
-            }
+            icon="share-outline"
+            onClick={handleShareClick}
+            color="var(--color-icon-default)"
           />
         </div>
-        <div ref={likeButtonRef}>
-          <IconButton
-            icon="heart-outline"
-            number={post.likes.length}
-            color={post.likes.includes(me._id) ? 'red' : 'grey'}
-            onClick={handleLikePost}
-            isPressed={isLikePending}
-          />
-        </div>
-        <div ref={dislikeButtonRef}>
-          <IconButton
-            icon="heart-off-outline"
-            number={post.dislikes.length}
-            color={post.dislikes.includes(me._id) ? 'red' : 'grey'}
-            onClick={handleDislikePost}
-            isPressed={isDislikePending}
-          />
-        </div>
-        <IconButton
-          icon="share-outline"
-          onClick={() => setShowShareModal(true)}
-        />
       </div>
       {showShareModal && (
         <ShareModal

@@ -21,8 +21,8 @@ export const LimitsDisplay: React.FC<LimitsDisplayProps> = ({
   if (isLoading || !limits) {
     return (
       <div className="animate-pulse flex space-x-2 items-center">
-        <div className="h-4 bg-muted rounded w-24"></div>
-        <div className="h-2 bg-muted rounded w-32"></div>
+        <div className="h-4 bg-white/10 rounded w-24"></div>
+        <div className="h-2 bg-white/10 rounded w-32"></div>
       </div>
     );
   }
@@ -38,16 +38,19 @@ export const LimitsDisplay: React.FC<LimitsDisplayProps> = ({
     <div className={`space-y-2 ${className}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium">
+          <span className="text-sm font-medium text-[var(--color-text)]">
             {type.charAt(0).toUpperCase() + type.slice(1)}
           </span>
           {limits.isPremium && (
-            <Badge variant="secondary" className="gap-1">
+            <Badge
+              variant="secondary"
+              className="gap-1 bg-white/10 text-[var(--color-text)]"
+            >
               <Crown className="h-3 w-3" />
             </Badge>
           )}
         </div>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-[var(--color-icon-default)]">
           {limitInfo.current}/{limitInfo.max}
         </span>
       </div>
@@ -59,7 +62,7 @@ export const LimitsDisplay: React.FC<LimitsDisplayProps> = ({
           <Button
             variant="outline"
             size="sm"
-            className="w-full gap-2"
+            className="w-full gap-2 bg-white/10 hover:bg-white/20 text-[var(--color-text)] border-white/20"
             onClick={handleUpgrade}
           >
             <Crown className="h-4 w-4" />
@@ -69,7 +72,7 @@ export const LimitsDisplay: React.FC<LimitsDisplayProps> = ({
       )}
 
       {limits.isPremium && limits.premiumExpiresAt && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-[var(--color-icon-default)]">
           Premium expires:{' '}
           {new Date(limits.premiumExpiresAt).toLocaleDateString()}
         </p>

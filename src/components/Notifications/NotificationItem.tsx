@@ -70,36 +70,44 @@ export const NotificationItem: FC<NotificationItemProps> = ({
     <div
       onClick={handleClick}
       className={cn(
-        'flex items-start gap-4 p-4 cursor-pointer transition-colors hover:bg-accent/50',
-        !notification.isRead && 'bg-accent/20'
+        'glass-card p-4 cursor-pointer transition-all duration-200 hover-scale',
+        !notification.isRead && 'bg-white/10'
       )}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}
     >
-      <div className="mt-1">
-        <Icon
-          className={cn(
-            'h-5 w-5',
-            notification.type.toLowerCase() === 'like' && 'text-red-500',
-            notification.type.toLowerCase() === 'comment' && 'text-blue-500',
-            notification.type.toLowerCase() === 'follow' && 'text-green-500',
-            notification.type.toLowerCase() === 'fren_post' &&
-              'text-purple-500',
-            notification.type.toLowerCase() === 'reward' && 'text-yellow-500',
-            notification.type.toLowerCase() === 'mention' && 'text-blue-500'
-          )}
-        />
-      </div>
-      <div className="flex-1 space-y-1">
-        <p className={cn('text-sm', !notification.isRead && 'font-medium')}>
-          {messageContent}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {formatDistanceToNow(new Date(notification.createdAt), {
-            addSuffix: true
-          })}
-        </p>
+      <div className="flex items-start gap-4">
+        <div className="mt-1">
+          <Icon
+            className={cn(
+              'h-5 w-5',
+              notification.type.toLowerCase() === 'like' && 'text-rose-500',
+              notification.type.toLowerCase() === 'comment' && 'text-blue-500',
+              notification.type.toLowerCase() === 'follow' &&
+                'text-emerald-500',
+              notification.type.toLowerCase() === 'fren_post' &&
+                'text-violet-500',
+              notification.type.toLowerCase() === 'reward' && 'text-amber-500',
+              notification.type.toLowerCase() === 'mention' && 'text-cyan-500'
+            )}
+          />
+        </div>
+        <div className="flex-1 space-y-1">
+          <p
+            className={cn(
+              'text-sm text-[var(--color-text)]',
+              !notification.isRead && 'font-medium'
+            )}
+          >
+            {messageContent}
+          </p>
+          <p className="text-xs text-[var(--color-icon-default)]">
+            {formatDistanceToNow(new Date(notification.createdAt), {
+              addSuffix: true
+            })}
+          </p>
+        </div>
       </div>
     </div>
   );

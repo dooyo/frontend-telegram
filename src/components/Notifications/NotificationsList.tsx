@@ -2,7 +2,6 @@ import { FC, useRef, useCallback, useEffect } from 'react';
 import { NotificationItem } from './NotificationItem';
 import { NotificationType } from '@/lib/api/types';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 
 interface NotificationsListProps {
   notifications: NotificationType[];
@@ -61,16 +60,20 @@ export const NotificationsList: FC<NotificationsListProps> = ({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[var(--color-icon-default)]" />
       </div>
     );
   }
 
   if (notifications.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+      <div className="flex flex-col items-center justify-center py-8 text-[var(--color-text)]">
         <p>No notifications yet</p>
-        <Button variant="ghost" size="sm" onClick={onRefresh} className="mt-2">
+        <Button
+          size="sm"
+          onClick={onRefresh}
+          className="mt-2 glass-card bg-primary hover:bg-primary/80 text-white shadow-lg transition-all duration-200 hover-scale"
+        >
           Refresh
         </Button>
       </div>
@@ -78,7 +81,7 @@ export const NotificationsList: FC<NotificationsListProps> = ({
   }
 
   return (
-    <div className="divide-y divide-border">
+    <div className="space-y-2 p-2">
       {notifications.map((notification) => (
         <NotificationItem
           key={notification._id}
@@ -92,7 +95,7 @@ export const NotificationsList: FC<NotificationsListProps> = ({
       <div ref={observerTarget} className="w-full py-4">
         {isFetchingNextPage && (
           <div className="flex justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[var(--color-icon-default)]" />
           </div>
         )}
       </div>
