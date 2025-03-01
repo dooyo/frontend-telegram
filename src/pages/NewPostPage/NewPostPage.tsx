@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPost } from '@/lib/api/posts';
@@ -13,12 +13,14 @@ import { LimitsDisplay } from '@/components/LimitsDisplay/LimitsDisplay';
 import { useLimits } from '@/context/LimitsContext';
 import { MediaPreview } from '@/components/MediaPreview/MediaPreview';
 import { useUrlDetection } from '@/hooks/useUrlDetection';
+import { MediaUpload, MediaFile } from '@/components/MediaUpload/MediaUpload';
 
 const MAX_CHARS = 280;
 
 export const NewPostPage: React.FC = () => {
   const [text, setText] = useState('');
   const [mentionedUserIds, setMentionedUserIds] = useState<string[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { urls } = useUrlDetection(text);
@@ -39,6 +41,23 @@ export const NewPostPage: React.FC = () => {
   const { limits, refreshLimits } = useLimits();
   const isAtLimit = limits?.posts.remaining === 0;
 
+  // Get media IDs from successfully uploaded files
+  const uploadedMediaIds = useMemo(() => {
+    return mediaFiles
+      .filter((media) => media.status === 'uploaded' && media.id)
+      .map((media) => media.id as string);
+  }, [mediaFiles]);
+
+  // Check if any media is still uploading
+  const isUploading = useMemo(() => {
+    return mediaFiles.some((media) => media.status === 'uploading');
+  }, [mediaFiles]);
+
+  // Check if any media has upload errors
+  const hasUploadErrors = useMemo(() => {
+    return mediaFiles.some((media) => media.status === 'error');
+  }, [mediaFiles]);
+
   const handleTextChange = useCallback((newText: string) => {
     if (newText.length <= MAX_CHARS) {
       setText(newText);
@@ -47,6 +66,10 @@ export const NewPostPage: React.FC = () => {
 
   const handleMentionsChange = useCallback((users: string[]) => {
     setMentionedUserIds(users);
+  }, []);
+
+  const handleMediaFilesChange = useCallback((files: MediaFile[]) => {
+    setMediaFiles(files);
   }, []);
 
   const handleRemoveUrl = useCallback((urlToRemove: string) => {
@@ -60,12 +83,23 @@ export const NewPostPage: React.FC = () => {
   }, []);
 
   const handlePost = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() && uploadedMediaIds.length === 0) return;
 
     try {
-      await mutateAsync({ text, mentionedUserIds } as any);
+      await mutateAsync({
+        text,
+        mentionedUserIds,
+        mediaIds: uploadedMediaIds
+      });
+
+      // Clean up by revoking all object URLs to prevent memory leaks
+      mediaFiles.forEach((mediaFile) => {
+        URL.revokeObjectURL(mediaFile.preview);
+      });
+
       setText('');
       setMentionedUserIds([]);
+      setMediaFiles([]);
       navigate(-1); // Go back to the previous page
     } catch (error) {
       console.error('Failed to post:', error);
@@ -84,6 +118,7 @@ export const NewPostPage: React.FC = () => {
 
   const charsLeft = MAX_CHARS - text.length;
   const isNearLimit = charsLeft <= 20;
+  const hasContent = text.trim().length > 0 || uploadedMediaIds.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] via-[#FDE1D3] to-[#FEC6A1]">
@@ -124,6 +159,14 @@ export const NewPostPage: React.FC = () => {
                 )}
                 disabled={isAtLimit}
               />
+
+              {/* Media Upload Component */}
+              <MediaUpload
+                mediaFiles={mediaFiles}
+                onMediaFilesChange={handleMediaFilesChange}
+                disabled={isAtLimit}
+              />
+
               {urls.length > 0 && (
                 <div className="space-y-2">
                   {urls
@@ -150,6 +193,13 @@ export const NewPostPage: React.FC = () => {
               Error: {(error as Error).message}
             </div>
           )}
+
+          {hasUploadErrors && (
+            <div className="text-destructive text-center mt-4">
+              Some media files failed to upload. Please remove them or try
+              again.
+            </div>
+          )}
         </div>
       </Container>
 
@@ -169,13 +219,15 @@ export const NewPostPage: React.FC = () => {
               onClick={handlePost}
               disabled={
                 isPending ||
-                !text.trim() ||
+                !hasContent ||
                 text.length > MAX_CHARS ||
-                isAtLimit
+                isAtLimit ||
+                isUploading ||
+                hasUploadErrors
               }
               className="bg-primary hover:bg-primary/90 text-white rounded-full px-8"
             >
-              {isPending ? 'Posting...' : 'Post'}
+              {isPending ? 'Posting...' : isUploading ? 'Uploading...' : 'Post'}
             </Button>
           </div>
           <LimitsDisplay type="posts" showUpgradeButton={isAtLimit} />

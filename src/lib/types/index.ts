@@ -31,6 +31,15 @@ export interface PostType {
   expiresAt: string;
   createdAt: string;
   updatedAt: string;
+  mediaFiles?: MediaFileType[];
+}
+
+export interface MediaFileType {
+  _id: string;
+  url: string;
+  type: 'image' | 'video';
+  postId: string;
+  createdAt: string;
 }
 
 export interface CommentType {

@@ -10,6 +10,19 @@ interface PaginatedResponse<T> {
   hasMore: boolean;
 }
 
+// New interfaces for media upload
+export interface UploadPermissionResponse {
+  uploadUrl: string;
+  fileName: string;
+  fileId: string;
+}
+
+export interface MediaConfirmationResponse {
+  id: string;
+  url: string;
+  type: 'image' | 'video';
+}
+
 const getPosts = async (
   params?: GetPostsParams
 ): Promise<PaginatedResponse<PostType>> => {
@@ -99,9 +112,73 @@ const postCommentOnPost = async (
   return response.json();
 };
 
-const createPost = async (data: {
+/**
+ * Request permission to upload a file to Supabase Storage
+ */
+export const getUploadPermission = async (
+  fileType: string,
+  fileSize: number,
+  fileName: string
+): Promise<UploadPermissionResponse> => {
+  const authToken = await getAuthToken();
+  if (!authToken) {
+    throw new Error('Authentication required');
+  }
+
+  const response = await fetch(`${API_URL}/media/upload-permission`, {
+    method: 'POST',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fileType, fileSize, fileName })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to get upload permission');
+  }
+
+  return response.json();
+};
+
+/**
+ * Confirm a successful upload to Supabase Storage
+ */
+export const confirmUpload = async (
+  fileId: string,
+  fileType: string,
+  fileSize: number
+): Promise<MediaConfirmationResponse> => {
+  const authToken = await getAuthToken();
+  if (!authToken) {
+    throw new Error('Authentication required');
+  }
+
+  const response = await fetch(`${API_URL}/media/confirm-upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: authToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fileId, fileType, fileSize })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to confirm upload');
+  }
+
+  return response.json();
+};
+
+/**
+ * Create a new post with optional media files
+ */
+export const createPost = async (data: {
   text: string;
   mentionedUserIds?: string[];
+  mediaIds?: string[];
 }) => {
   const authToken = await getAuthToken();
   if (!authToken) {
@@ -116,6 +193,7 @@ const createPost = async (data: {
     },
     body: JSON.stringify(data)
   });
+
   if (response.status === 401) {
     throw new Error('Unauthorized');
   }
@@ -249,7 +327,6 @@ const deleteComment = async (commentId: string) => {
 export {
   getPosts,
   getPost,
-  createPost,
   postCommentOnPost,
   likePost,
   dislikePost,
