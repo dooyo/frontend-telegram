@@ -32,6 +32,12 @@ import { Badge } from '@/components/ui/badge';
 import { Crown } from 'lucide-react';
 import { useLimits } from '@/context/LimitsContext';
 
+// Version number to track updates
+const APP_VERSION = '1.2.0';
+
+// Log version on module load
+console.log(`ProfilePage component version ${APP_VERSION} loaded`);
+
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { removeAuthToken } = useAuth() as any;
@@ -484,6 +490,14 @@ export const ProfilePage: React.FC = () => {
             onClose={() => setShowShareModal(false)}
           />
         )}
+
+        {/* Footer with version */}
+        <div className="mt-8 text-center">
+          <p className="text-xs text-[var(--color-icon-default)] opacity-50">
+            Dooyo v{APP_VERSION} | Build date:{' '}
+            {new Date().toISOString().split('T')[0]}
+          </p>
+        </div>
       </Container>
     </div>
   );

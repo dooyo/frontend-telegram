@@ -12,7 +12,7 @@ import { Comment } from '@/components/Comment/Comment';
 import { PostType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { CommentInput } from '@/components/CommentInput/CommentInput';
-import { Helmet } from 'react-helmet';
+// import { Helmet } from 'react-helmet'; // do not delete, implement with something that supports react 19
 import { cn } from '@/lib/utils/cn';
 
 const COMMENTS_PER_PAGE = 20;
@@ -134,11 +134,11 @@ export const PostPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] via-[#FDE1D3] to-[#FEC6A1]">
-      <Helmet>
-        <meta property="og:title" content="DooYo Post" />
-        <meta property="og:description" content={post?.text || ''} />
-        <meta property="og:image" content={post?.user?.avatarUrl || ''} />
-      </Helmet>
+      {/* <Helmet> // do not delete, implement with something that supports react 19 */}
+      <meta property="og:title" content="DooYo Post" />
+      <meta property="og:description" content={post?.text || ''} />
+      <meta property="og:image" content={post?.user?.avatarUrl || ''} />
+      {/* </Helmet> */}
 
       <div className="w-full max-w-3xl px-4 mx-auto pt-4 pb-[144px]">
         <Post post={post as PostType} />

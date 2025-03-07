@@ -7,7 +7,7 @@ import {
 // It is important, to mock the environment only for development purposes. When building the
 // application, import.meta.env.DEV will become false, and the code inside will be tree-shaken,
 // so you will not see it in your final bundle.
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV || window.location.hostname.includes('github.io')) {
   let shouldMock: boolean;
 
   // Try to extract launch parameters to check if the current environment is Telegram-based.
@@ -21,7 +21,11 @@ if (import.meta.env.DEV) {
     // enables modifying the window object.
     shouldMock = !!sessionStorage.getItem('____mocked');
   } catch (e) {
+    // If we can't retrieve launch parameters, we should mock the environment
     shouldMock = true;
+    console.log(
+      'Unable to retrieve launch parameters, enabling mock environment'
+    );
   }
 
   if (shouldMock) {

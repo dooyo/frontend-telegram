@@ -15,7 +15,14 @@ TelegramAnalytics.init({
   appName: 'dooyoapp20250205'
 });
 
-init();
-initData.restore();
+// Initialize the Telegram SDK with error handling
+try {
+  init();
+  initData.restore();
+  console.log('Telegram SDK initialized successfully');
+} catch (error) {
+  console.warn('Failed to initialize Telegram SDK:', error);
+  console.info('Running in browser mode without Telegram environment');
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<Root />);
