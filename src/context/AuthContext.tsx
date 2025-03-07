@@ -8,7 +8,11 @@ import {
 import { jwtDecode } from 'jwt-decode';
 import { UserType } from '@/lib/types';
 import { authTgUser, getMe } from '@/lib/api/auth';
-import { initData, useSignal, useLaunchParams } from '@telegram-apps/sdk-react';
+import {
+  initData,
+  useSignal,
+  retrieveLaunchParams
+} from '@telegram-apps/sdk-react';
 
 interface AuthContextProps {
   authToken: string | null;
@@ -27,12 +31,12 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   const [user, setUser] = useState<UserType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const initDataRaw = useSignal(initData.raw);
-  const lp = useLaunchParams();
+  const lp = retrieveLaunchParams();
 
   // Store referral info as soon as we have launch params
   useEffect(() => {
-    if (lp.startParam) {
-      const parts = lp.startParam.split('_');
+    if (lp.tgWebAppStartParam) {
+      const parts = lp.tgWebAppStartParam.split('_');
       if (parts.length >= 4 && parts[2] === 'ref') {
         const fromUser = parts[3];
         sessionStorage.setItem('referral_from_user', fromUser);

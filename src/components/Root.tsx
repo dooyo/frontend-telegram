@@ -12,7 +12,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LimitsProvider } from '@/context/LimitsContext';
 import { routes } from '@/navigation/routes.tsx';
 import { AppLayout } from '@/components/AppLayout/AppLayout';
-import { useLaunchParams } from '@telegram-apps/sdk-react';
+import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
 const queryClient = new QueryClient();
 
@@ -35,15 +35,15 @@ const DeepLinkHandler: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const navigate = useNavigate();
-  const lp = useLaunchParams();
+  const lp = retrieveLaunchParams();
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     if (isLoading) return;
 
     const handled = sessionStorage.getItem('handled_deep_link');
-    if (isAuthenticated && !handled && lp.startParam) {
-      const parts = lp.startParam.split('_');
+    if (isAuthenticated && !handled && lp.tgWebAppStartParam) {
+      const parts = lp.tgWebAppStartParam.split('_');
       const type = parts[0]; // 'post' or 'profile'
       const id = parts[1];
       if (type === 'post' || type === 'profile') {

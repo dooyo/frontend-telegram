@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react';
-import { useLaunchParams } from '@telegram-apps/sdk-react';
+import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
 interface AppRootProps {
   platform: 'ios' | 'base';
@@ -11,11 +11,11 @@ const AppRoot: FC<AppRootProps> = ({ platform, children }) => {
 };
 
 export const App: FC = () => {
-  const lp = useLaunchParams();
+  const lp = retrieveLaunchParams();
 
   return (
     <AppRoot
-      platform={['macos', 'ios'].includes(lp.platform) ? 'ios' : 'base'}
+      platform={['macos', 'ios'].includes(lp.tgWebAppPlatform) ? 'ios' : 'base'}
     ></AppRoot>
   );
 };

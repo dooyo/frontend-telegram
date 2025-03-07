@@ -18,7 +18,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { getUploadPermission, confirmUpload } from '@/lib/api/posts';
 import { supabase } from '@/lib/supabase';
-import { useLaunchParams } from '@telegram-apps/sdk-react';
+import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
 // Maximum number of files that can be uploaded
 const MAX_FILES = 10;
@@ -66,14 +66,14 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
     const [showGrid, setShowGrid] = useState(true);
 
     // Get Telegram launch params to detect platform
-    const launchParams = useLaunchParams();
+    const launchParams = retrieveLaunchParams();
     const isMobile = ['android', 'ios', 'ipados'].includes(
-      launchParams.platform
+      launchParams.tgWebAppPlatform
     );
 
     console.log(
       'MediaUpload running on platform:',
-      launchParams.platform,
+      launchParams.tgWebAppPlatform,
       'isMobile:',
       isMobile
     );
@@ -186,7 +186,7 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           'File sizes:',
           selectedFiles.map((f) => f.size)
         );
-        console.log('Running on platform:', launchParams.platform);
+        console.log('Running on platform:', launchParams.tgWebAppPlatform);
 
         // Check if adding these files would exceed the maximum
         if (mediaFiles.length + selectedFiles.length > MAX_FILES) {
@@ -281,7 +281,7 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           }
         }
       },
-      [mediaFiles, onMediaFilesChange, launchParams.platform]
+      [mediaFiles, onMediaFilesChange, launchParams.tgWebAppPlatform]
     );
 
     const handleRemoveFile = useCallback(
@@ -304,7 +304,7 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
       if (fileInputRef.current) {
         console.log(
           'Triggering file input on platform:',
-          launchParams.platform
+          launchParams.tgWebAppPlatform
         );
         try {
           fileInputRef.current.click();
