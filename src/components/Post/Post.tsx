@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { likePost, dislikePost, deletePost } from '@/lib/api/posts';
 import { IconButton } from '@/components/IconButton/IconButton';
-import { PostType, UserType } from '@/lib/types';
+import { PostType, UserType, MediaFileType } from '@/lib/types';
 import { Avatar } from 'files-ui-react-19';
 import { ShareModal } from '@/components/ShareModal/ShareModal';
 import { useLimits } from '@/context/LimitsContext';
@@ -17,6 +17,8 @@ import {
 import { Flag, Trash2 } from 'lucide-react';
 import { ContentText } from '../ContentText/ContentText';
 import { useTimeAnimation } from '@/hooks/useTimeAnimation';
+import { MediaCarousel } from '../MediaCarousel/MediaCarousel';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type PropsType = {
   post: PostType;
@@ -24,6 +26,7 @@ type PropsType = {
 
 export const Post = ({ post }: PropsType) => {
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isLoadingMedia, setIsLoadingMedia] = useState(true);
   const likeButtonRef = useRef<HTMLDivElement>(null);
   const dislikeButtonRef = useRef<HTMLDivElement>(null);
   const clockButtonRef = useRef<HTMLDivElement>(null);
@@ -41,6 +44,15 @@ export const Post = ({ post }: PropsType) => {
   const me: UserType = JSON.parse(localStorage.getItem('me') || '{}');
   const hasReacted = post.reactions.includes(me._id);
   const isMyPost = post.user._id === me._id;
+
+  // Set loading to false after a short delay to allow images to load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoadingMedia(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const { mutateAsync: likePostMutate, isPending: isLikePending } = useMutation(
     {
@@ -130,129 +142,139 @@ export const Post = ({ post }: PropsType) => {
     setShowShareModal(true);
   };
 
+  const hasMediaFiles =
+    post.mediaFiles &&
+    Array.isArray(post.mediaFiles) &&
+    post.mediaFiles.length > 0;
+
   return (
-    <>
-      <div
-        className="glass-card p-4 transition-transform duration-200 hover:scale-[1.02] cursor-pointer"
-        onClick={handlePostClick}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <Avatar
-              src={post.user.avatarUrl?.replace('localhost', '10.100.102.18')}
-              alt={`${post.user.username}'s avatar`}
-              style={{
-                width: '40px',
-                height: '40px',
-                backgroundColor: '#DFDAD6',
-                border: '1px solid #CBC3BE',
-                borderRadius: '50%'
-              }}
-              variant="circle"
-              readOnly
-              onClick={handleUserClick}
-            />
-            <div className="flex flex-col">
-              <span
-                className="font-medium text-foreground"
-                onClick={handleUserClick}
-              >
-                @{post.user.username}
-              </span>
+    <div
+      className="glass-card p-4 mb-4 rounded-lg cursor-pointer"
+      onClick={handlePostClick}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <div className="flex items-center gap-2" onClick={handleUserClick}>
+          <Avatar
+            src={post.user.avatarUrl?.replace('localhost', '10.100.102.18')}
+            alt={post.user.username}
+            style={{
+              width: '40px',
+              height: '40px',
+              backgroundColor: '#DFDAD6',
+              border: '1px solid #CBC3BE',
+              borderRadius: '50%'
+            }}
+            variant="circle"
+            readOnly
+          />
+          <div>
+            <div className="font-medium">{post.user.username}</div>
+            <div className="text-xs text-muted-foreground">
+              {new Date(post.createdAt).toLocaleString()}
             </div>
           </div>
+        </div>
 
-          <DropdownMenu modal={false}>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="text-[var(--color-icon-default)] hover:text-[var(--color-icon-hover)] transition-colors px-2"
-                onClick={(e) => e.stopPropagation()}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="text-[var(--color-icon-default)] hover:text-[var(--color-icon-hover)] transition-colors px-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              •••
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {isMyPost && (
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={handleDelete}
               >
-                •••
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {isMyPost && (
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
-                  onClick={handleDelete}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              )}
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            )}
+            {!isMyPost && (
               <DropdownMenuItem onClick={handleReport}>
                 <Flag className="w-4 h-4 mr-2" />
                 Report
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-        <div className="mt-3 text-foreground">
-          <ContentText
-            text={post.text}
-            className="leading-relaxed"
-            onPostClick={handlePostClick}
-          />
-        </div>
+      <div className="mb-4">
+        <ContentText text={post.text} />
+      </div>
 
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/10">
-          <div className="flex items-center gap-6">
-            <div ref={clockButtonRef}>
-              <IconButton
-                icon="clock-outline"
-                color={timeChangeColor}
-                number={
-                  <motion.div
-                    style={{ color: timeChangeColor }}
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {currentTime}
-                  </motion.div>
-                }
-              />
-            </div>
-            <div ref={likeButtonRef}>
-              <IconButton
-                icon="heart-outline"
-                number={post.likes.length}
-                color={
-                  post.likes.includes(me._id)
-                    ? 'var(--color-icon-active)'
-                    : 'var(--color-icon-default)'
-                }
-                onClick={handleLikePost}
-                isPressed={isLikePending}
-              />
-            </div>
-            <div ref={dislikeButtonRef}>
-              <IconButton
-                icon="heart-off-outline"
-                number={post.dislikes.length}
-                color={
-                  post.dislikes.includes(me._id)
-                    ? 'var(--color-icon-active)'
-                    : 'var(--color-icon-default)'
-                }
-                onClick={handleDislikePost}
-                isPressed={isDislikePending}
-              />
-            </div>
+      {/* Display media carousel if post has media files */}
+      {hasMediaFiles && !isLoadingMedia && (
+        <div className="mb-4" onClick={(e) => e.stopPropagation()}>
+          <MediaCarousel mediaFiles={post.mediaFiles as MediaFileType[]} />
+        </div>
+      )}
+
+      {/* Show loading state while media is loading */}
+      {hasMediaFiles && isLoadingMedia && (
+        <div className="mb-4">
+          <Skeleton className="w-full h-[300px] rounded-lg" />
+        </div>
+      )}
+
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <div
+            className="flex items-center gap-1 cursor-pointer"
+            onClick={handleLikePost}
+            ref={likeButtonRef}
+          >
             <IconButton
-              icon="comment-outline"
-              number={post.commentCount}
-              onClick={handleCommentClick}
-              color="var(--color-icon-default)"
+              icon="heart-outline"
+              color={
+                post.likes.includes(me._id)
+                  ? 'var(--color-icon-active)'
+                  : 'var(--color-icon-default)'
+              }
+              isPressed={isLikePending}
             />
+            <span className="text-sm">{post.likes.length}</span>
           </div>
-          <IconButton
-            icon="share-outline"
+          <div
+            className="flex items-center gap-1 cursor-pointer"
+            onClick={handleDislikePost}
+            ref={dislikeButtonRef}
+          >
+            <IconButton
+              icon="heart-off-outline"
+              color={
+                post.dislikes.includes(me._id)
+                  ? 'var(--color-icon-active)'
+                  : 'var(--color-icon-default)'
+              }
+              isPressed={isDislikePending}
+            />
+            <span className="text-sm">{post.dislikes.length}</span>
+          </div>
+          <div
+            className="flex items-center gap-1 cursor-pointer"
+            onClick={handleCommentClick}
+          >
+            <IconButton icon="comment-outline" />
+            <span className="text-sm">{post.commentCount}</span>
+          </div>
+          <div
+            className="flex items-center gap-1 cursor-pointer"
             onClick={handleShareClick}
-            color="var(--color-icon-default)"
-          />
+          >
+            <IconButton icon="share-outline" />
+          </div>
+        </div>
+        <div className="flex items-center gap-1" ref={clockButtonRef}>
+          <IconButton icon="clock-outline" color={timeChangeColor} />
+          <motion.span className="text-sm" style={{ color: timeChangeColor }}>
+            {currentTime}
+          </motion.span>
         </div>
       </div>
       {showShareModal && (
@@ -261,6 +283,6 @@ export const Post = ({ post }: PropsType) => {
           onClose={() => setShowShareModal(false)}
         />
       )}
-    </>
+    </div>
   );
 };

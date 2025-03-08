@@ -70,6 +70,7 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
     const isMobile = ['android', 'ios', 'ipados'].includes(
       launchParams.tgWebAppPlatform
     );
+    const isAndroid = launchParams.tgWebAppPlatform === 'android';
 
     console.log(
       'MediaUpload running on platform:',
@@ -220,50 +221,91 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
         }
 
         try {
-          // First, add placeholder entries for the files being uploaded
-          const placeholderFiles = validFiles.map(
-            (file): MediaFile => ({
+          // For Android, we're handling one file at a time, so we can optimize the flow
+          if (isAndroid && validFiles.length === 1) {
+            const file = validFiles[0];
+
+            // Add placeholder entry for the file being uploaded
+            const placeholderFile: MediaFile = {
               file,
               preview: '', // Empty for now
               type: ALLOWED_IMAGE_TYPES.includes(file.type) ? 'image' : 'video',
               status: 'uploading',
               progress: 0
-            })
-          );
+            };
 
-          // Add the placeholders to the display
-          const updatedFilesWithPlaceholders = [
-            ...mediaFiles,
-            ...placeholderFiles
-          ];
-          onMediaFilesChange(updatedFilesWithPlaceholders);
+            // Add the placeholder to the display
+            const updatedFilesWithPlaceholder = [
+              ...mediaFiles,
+              placeholderFile
+            ];
+            onMediaFilesChange(updatedFilesWithPlaceholder);
 
-          // Upload each file and get the updated MediaFile objects
-          const uploadResults = await Promise.all(
-            validFiles.map((file) => uploadFile(file))
-          );
+            // Upload the file
+            const uploadResult = await uploadFile(file);
 
-          // Replace the placeholders with the actual uploaded files
-          const finalFiles = [...mediaFiles];
+            // Replace the placeholder with the actual uploaded file
+            const finalFiles = [...mediaFiles, uploadResult];
 
-          // Find the index where placeholders start
-          const startIndex = mediaFiles.length;
+            // Update state with the final files
+            onMediaFilesChange(finalFiles);
 
-          // Replace each placeholder with its corresponding upload result
-          uploadResults.forEach((result, index) => {
-            finalFiles[startIndex + index] = result;
-          });
+            // Set the active index to the newly added file
+            setActiveIndex(finalFiles.length - 1);
 
-          // Update state with the final files
-          onMediaFilesChange(finalFiles);
+            // Log any errors
+            if (uploadResult.status === 'error' && uploadResult.error) {
+              setError(`File failed to upload: ${uploadResult.error}`);
+            }
+          } else {
+            // Original multi-file upload logic for non-Android platforms
+            // First, add placeholder entries for the files being uploaded
+            const placeholderFiles = validFiles.map(
+              (file): MediaFile => ({
+                file,
+                preview: '', // Empty for now
+                type: ALLOWED_IMAGE_TYPES.includes(file.type)
+                  ? 'image'
+                  : 'video',
+                status: 'uploading',
+                progress: 0
+              })
+            );
 
-          // Log any errors
-          const errors = uploadResults
-            .filter((result) => result.status === 'error')
-            .map((result) => result.error);
+            // Add the placeholders to the display
+            const updatedFilesWithPlaceholders = [
+              ...mediaFiles,
+              ...placeholderFiles
+            ];
+            onMediaFilesChange(updatedFilesWithPlaceholders);
 
-          if (errors.length > 0) {
-            setError(`Some files failed to upload: ${errors.join(', ')}`);
+            // Upload each file and get the updated MediaFile objects
+            const uploadResults = await Promise.all(
+              validFiles.map((file) => uploadFile(file))
+            );
+
+            // Replace the placeholders with the actual uploaded files
+            const finalFiles = [...mediaFiles];
+
+            // Find the index where placeholders start
+            const startIndex = mediaFiles.length;
+
+            // Replace each placeholder with its corresponding upload result
+            uploadResults.forEach((result, index) => {
+              finalFiles[startIndex + index] = result;
+            });
+
+            // Update state with the final files
+            onMediaFilesChange(finalFiles);
+
+            // Log any errors
+            const errors = uploadResults
+              .filter((result) => result.status === 'error')
+              .map((result) => result.error);
+
+            if (errors.length > 0) {
+              setError(`Some files failed to upload: ${errors.join(', ')}`);
+            }
           }
         } catch (err) {
           console.error('Error during file upload process:', err);
@@ -281,7 +323,7 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           }
         }
       },
-      [mediaFiles, onMediaFilesChange, launchParams.tgWebAppPlatform]
+      [mediaFiles, onMediaFilesChange, launchParams.tgWebAppPlatform, isAndroid]
     );
 
     const handleRemoveFile = useCallback(
@@ -307,6 +349,15 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           launchParams.tgWebAppPlatform
         );
         try {
+          // For Android users, show a message about one-by-one file selection
+          if (isAndroid && mediaFiles.length > 0) {
+            // Show a message to the user that they can add one file at a time
+            setError(
+              'On Android, you can add one file at a time. Tap "Add Media" again to add another file.'
+            );
+            // Don't auto-clear the error message on Android, as it's more of an informational message
+            // The error will be cleared when the file selection starts
+          }
           fileInputRef.current.click();
         } catch (err) {
           console.error('Error triggering file input:', err);
@@ -452,7 +503,7 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           ref={fileInputRef}
           onChange={handleFileChange}
           accept={ALLOWED_TYPES.join(',')}
-          multiple
+          multiple={!isAndroid}
           className="hidden"
           disabled={disabled}
         />
@@ -466,13 +517,21 @@ export const MediaUpload = forwardRef<MediaUploadRef, MediaUploadProps>(
           disabled={disabled || mediaFiles.length >= MAX_FILES}
         >
           <ImageIcon className="w-5 h-5" />
-          <span>Add Photos/Videos</span>
+          <span>{isAndroid ? 'Add Photo/Video' : 'Add Photos/Videos'}</span>
           {mediaFiles.length > 0 && (
             <span className="text-xs text-muted-foreground ml-1">
               ({mediaFiles.length}/{MAX_FILES})
             </span>
           )}
         </Button>
+
+        {/* Android-specific help text */}
+        {isAndroid && (
+          <p className="text-xs text-muted-foreground text-center">
+            On Android, you can add one file at a time. Tap the button again to
+            add more.
+          </p>
+        )}
 
         {/* Error message */}
         {error && (

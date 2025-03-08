@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPost } from '@/lib/api/posts';
@@ -21,6 +21,10 @@ export const NewPostPage: React.FC = () => {
   const [text, setText] = useState('');
   const [mentionedUserIds, setMentionedUserIds] = useState<string[]>([]);
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const mediaUploadRef = useRef<{
+    uploadAllPendingFiles: () => Promise<string[]>;
+  }>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { urls } = useUrlDetection(text);
@@ -41,23 +45,6 @@ export const NewPostPage: React.FC = () => {
   const { limits, refreshLimits } = useLimits();
   const isAtLimit = limits?.posts.remaining === 0;
 
-  // Get media IDs from successfully uploaded files
-  const uploadedMediaIds = useMemo(() => {
-    return mediaFiles
-      .filter((media) => media.status === 'uploaded' && media.id)
-      .map((media) => media.id as string);
-  }, [mediaFiles]);
-
-  // Check if any media is still uploading
-  const isUploading = useMemo(() => {
-    return mediaFiles.some((media) => media.status === 'uploading');
-  }, [mediaFiles]);
-
-  // Check if any media has upload errors
-  const hasUploadErrors = useMemo(() => {
-    return mediaFiles.some((media) => media.status === 'error');
-  }, [mediaFiles]);
-
   const handleTextChange = useCallback((newText: string) => {
     if (newText.length <= MAX_CHARS) {
       setText(newText);
@@ -66,10 +53,6 @@ export const NewPostPage: React.FC = () => {
 
   const handleMentionsChange = useCallback((users: string[]) => {
     setMentionedUserIds(users);
-  }, []);
-
-  const handleMediaFilesChange = useCallback((files: MediaFile[]) => {
-    setMediaFiles(files);
   }, []);
 
   const handleRemoveUrl = useCallback((urlToRemove: string) => {
@@ -83,26 +66,64 @@ export const NewPostPage: React.FC = () => {
   }, []);
 
   const handlePost = async () => {
-    if (!text.trim() && uploadedMediaIds.length === 0) return;
+    if (!text.trim() && mediaFiles.length === 0) return;
 
     try {
+      setIsUploading(true);
+
+      // Upload any pending media files
+      let mediaIds: string[] = [];
+
+      if (mediaFiles.some((file) => file.status === 'pending')) {
+        console.log('Uploading pending files before posting');
+        console.log(
+          'Media files status:',
+          mediaFiles.map((f) => ({
+            status: f.status,
+            type: f.type,
+            id: f.id,
+            hasFile: !!f.file,
+            hasPreview: !!f.preview,
+            fileName: f.file?.name
+          }))
+        );
+
+        try {
+          const uploadedIds =
+            await mediaUploadRef.current?.uploadAllPendingFiles();
+          console.log('Upload complete, received IDs:', uploadedIds);
+          if (uploadedIds && uploadedIds.length > 0) {
+            mediaIds = [...mediaIds, ...uploadedIds];
+          }
+        } catch (error) {
+          console.error('Error uploading files:', error);
+          setIsUploading(false);
+          return;
+        }
+      } else {
+        // If there are already uploaded files, collect their IDs
+        mediaIds = mediaFiles
+          .filter((file) => file.status === 'uploaded' && file.id)
+          .map((file) => file.id as string);
+        console.log('Using existing uploaded media IDs:', mediaIds);
+      }
+
+      // Create the post with the uploaded media IDs
       await mutateAsync({
         text,
         mentionedUserIds,
-        mediaIds: uploadedMediaIds
+        mediaIds
       });
 
-      // Clean up by revoking all object URLs to prevent memory leaks
-      mediaFiles.forEach((mediaFile) => {
-        URL.revokeObjectURL(mediaFile.preview);
-      });
-
+      // Reset state
       setText('');
       setMentionedUserIds([]);
       setMediaFiles([]);
       navigate(-1); // Go back to the previous page
     } catch (error) {
       console.error('Failed to post:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -118,7 +139,7 @@ export const NewPostPage: React.FC = () => {
 
   const charsLeft = MAX_CHARS - text.length;
   const isNearLimit = charsLeft <= 20;
-  const hasContent = text.trim().length > 0 || uploadedMediaIds.length > 0;
+  const hasContent = text.trim().length > 0 || mediaFiles.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] via-[#FDE1D3] to-[#FEC6A1]">
@@ -160,12 +181,15 @@ export const NewPostPage: React.FC = () => {
                 disabled={isAtLimit}
               />
 
-              {/* Media Upload Component */}
-              <MediaUpload
-                mediaFiles={mediaFiles}
-                onMediaFilesChange={handleMediaFilesChange}
-                disabled={isAtLimit}
-              />
+              <div className="space-y-4">
+                <MediaUpload
+                  mediaFiles={mediaFiles}
+                  onMediaFilesChange={setMediaFiles}
+                  className="mt-4"
+                  disabled={isAtLimit || isUploading}
+                  ref={mediaUploadRef}
+                />
+              </div>
 
               {urls.length > 0 && (
                 <div className="space-y-2">
@@ -193,13 +217,6 @@ export const NewPostPage: React.FC = () => {
               Error: {(error as Error).message}
             </div>
           )}
-
-          {hasUploadErrors && (
-            <div className="text-destructive text-center mt-4">
-              Some media files failed to upload. Please remove them or try
-              again.
-            </div>
-          )}
         </div>
       </Container>
 
@@ -222,8 +239,7 @@ export const NewPostPage: React.FC = () => {
                 !hasContent ||
                 text.length > MAX_CHARS ||
                 isAtLimit ||
-                isUploading ||
-                hasUploadErrors
+                isUploading
               }
               className="bg-primary hover:bg-primary/90 text-white rounded-full px-8"
             >
